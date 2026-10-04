@@ -20,6 +20,10 @@
 @media(max-height:650px){.sidebar{padding-top:14px}.sidebar-caption,.sidebar-bottom{display:none}.brand{margin-bottom:12px}.nav-label{padding-top:10px}.document-tabs{max-height:28vh}.toc-heading{margin-top:5px;padding-top:10px}.library-secondary .nav-item{padding-top:5px;padding-bottom:5px}}
 @media print{.sidebar,.topbar,.footer,.reader-topline,.reader-bottom,.prev-next,.source-ref,.toast,dialog{display:none!important}.workspace{margin:0}main{padding:0;max-width:none}.reading{max-width:none}.reading-point{break-inside:avoid}.chapter-summary,.practice{background:white}}
 .library-tools .nav-item{width:auto;white-space:nowrap}.document-tab strong{word-break:keep-all}
+.topbar{position:sticky;top:0;z-index:20;display:grid;grid-template-columns:minmax(0,1fr) minmax(220px,560px) minmax(0,1fr);gap:20px;height:88px;padding:0 32px;background:var(--paper)}.header-start{display:flex;align-items:center;gap:10px;min-width:0}.header-title{font-size:12px;font-weight:600;line-height:1.6;word-break:keep-all}.top-actions{justify-self:end;margin:0}.header-search{position:relative;min-width:0;width:100%}#search-form{display:flex;align-items:center;gap:10px;padding:9px 12px;border:1px solid #cdd6c4;border-radius:9px;background:#fff}#search-form:focus-within{border-color:#819660;box-shadow:0 0 0 3px #81966020}#search-icon{flex-shrink:0;color:#7c8b71}#search-icon svg{width:18px;height:18px}#search-input{min-width:0;flex:1;width:100%;border:0;outline:0;background:transparent;font-size:13px;color:var(--ink);line-height:1.8}#search-input::placeholder{color:#8c9686}.search-submit{font-size:11px;white-space:nowrap;padding:6px 8px;border-radius:4px;background:var(--soft)}#search-form kbd{flex-shrink:0;white-space:nowrap}.search-panel{position:absolute;top:calc(100% + 10px);left:0;right:0;padding:12px 18px 18px;background:var(--paper);border:1px solid var(--line);border-radius:10px;box-shadow:0 15px 45px #23352024;max-height:calc(100dvh - 110px);overflow:auto;overscroll-behavior:contain}.search-panel[hidden]{display:none}.search-panel-top{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:10px;color:var(--muted)}.search-panel #search-results{max-height:none;overflow:visible;margin-top:10px}.search-panel .empty-state{padding:25px 8px;margin-top:12px}.search-panel .search-result{overflow-wrap:anywhere}.contextbar{padding:20px 52px 0;font-size:11px;flex-wrap:wrap}.contextbar+main{padding-top:28px}
+@media(max-width:1150px){.topbar{grid-template-columns:minmax(0,1fr) minmax(220px,440px) minmax(0,1fr);padding:0 24px;gap:12px}.header-title{font-size:10px}.contextbar{padding-left:30px;padding-right:30px}}
+@media(max-width:850px){.topbar{grid-template-columns:34px minmax(0,1fr) 34px;gap:10px;height:76px;padding:0 16px}.header-title{display:none}#search-form{gap:7px;padding:8px}#search-input{font-size:16px}#search-form kbd{display:none}.search-submit{padding:5px}.contextbar{padding:18px 20px 0}.search-panel{position:fixed;top:70px;left:12px;right:12px;max-height:calc(100dvh - 84px)}.contextbar+main{padding-top:22px}}
+@media print{.contextbar{display:none}}
 </style>
 
 
@@ -35,19 +39,22 @@
   </aside>
   <div class="workspace">
     <header class="topbar">
-      <button id="menu-toggle" class="icon-button mobile-only" aria-label="메뉴 열기" aria-controls="sidebar" aria-expanded="false"></button>
-      <div id="breadcrumb" class="breadcrumb">나의 라이브러리</div>
-      <div class="top-actions"><button id="search-open" class="search-trigger" aria-label="서재에서 검색"><span id="search-icon"></span><span class="search-label">서재에서 검색</span><kbd>Ctrl K</kbd></button><span class="avatar" aria-label="개인 서재">私</span></div>
+      <div class="header-start"><button id="menu-toggle" class="icon-button mobile-only" aria-label="메뉴 열기" aria-controls="sidebar" aria-expanded="false"></button><a class="header-title" href="#home">지식 라이브러리</a></div>
+      <div id="header-search" class="header-search">
+        <form id="search-form" role="search" aria-label="전체 자료 검색">
+          <span id="search-icon" aria-hidden="true"></span><input id="search-input" type="search" aria-label="전체 자료 검색어" aria-controls="search-panel" placeholder="모든 자료에서 검색" autocomplete="off"><button class="search-submit" type="submit" aria-label="검색 실행">검색</button><kbd aria-hidden="true">Ctrl K</kbd>
+        </form>
+        <section id="search-panel" class="search-panel" aria-label="전체 자료 검색 결과" hidden>
+          <div class="search-panel-top"><span>전체 자료 · 본문, 소개, 연결된 지식</span><button id="search-close" class="icon-button" type="button" aria-label="검색 결과 닫기">✕</button></div>
+          <div id="search-results" role="region" aria-label="검색 결과" aria-live="polite"></div>
+        </section>
+      </div>
+      <div class="top-actions"><span class="avatar" aria-label="개인 서재">私</span></div>
     </header>
+    <div id="breadcrumb" class="breadcrumb contextbar">나의 라이브러리</div>
     <main id="main" tabindex="-1"></main>
     <footer class="footer"><span>사유의 서재</span><span>지식을 모으는 곳에서, 삶을 이해하는 곳으로.</span></footer>
   </div>
-  <dialog id="search-dialog" aria-labelledby="search-title">
-    <div class="dialog-top"><h2 id="search-title">서재에서 검색</h2><button class="icon-button" data-close="search-dialog" aria-label="검색 닫기">✕</button></div>
-    <label class="search-scope-label" for="search-scope">검색 범위</label><select id="search-scope"></select>
-    <label class="search-field"><span id="field-search-icon"></span><input id="search-input" type="search" placeholder="개념, 문장, 책 제목으로 찾아보세요" autocomplete="off"></label>
-    <div id="search-results" role="region" aria-label="검색 결과" aria-live="polite"></div>
-  </dialog>
   <dialog id="source-dialog" aria-labelledby="source-title">
     <div class="dialog-top"><h2 id="source-title">원문 페이지 확인</h2><button class="icon-button" data-close="source-dialog" aria-label="원문 안내 닫기">✕</button></div>
     <div id="source-detail"></div>
@@ -171,8 +178,6 @@
     route=resolveRoute();
     document.documentElement.style.setProperty('--reading-size',`${fontSize}px`);
     navigation();
-    $('search-open').setAttribute('aria-label',route.book?'이 PDF에서 검색':'서재에서 검색');
-    $('search-open').querySelector('.search-label').textContent=route.book?'이 PDF에서 검색':'서재에서 검색';
     const labels={home:'나의 라이브러리',connections:'연결된 지식',saved:'책갈피',sources:'자료와 읽기 안내',missing:'페이지를 찾을 수 없음'};
     const label=route.book?.title || labels[route.type];
     $('breadcrumb').innerHTML=`<a href="#home">나의 라이브러리</a>${route.type!=='home'?`<span>/</span>${esc(label)}`:''}`;
@@ -190,8 +195,27 @@
     document.querySelector('.workspace').inert=open;
     if(open)$('sidebar').querySelector('a').focus();else if(restore)$('menu-toggle').focus();
   }
-  function showSearch(query='') {$('search-scope').innerHTML='<option value="">모든 PDF에서 검색</option>'+books.map(b=>`<option value="${b.id}">${esc(b.title)}</option>`).join('');$('search-scope').value=route.book?.id || '';toggleMenu(false,false);$('search-dialog').showModal();$('search-input').value=query;search(query);$('search-input').focus();}
+  function showSearch(query=$('search-input').value) {
+    toggleMenu(false,false);
+    $('search-input').value=query;
+    $('search-panel').hidden=false;
+    search(query);
+    $('search-input').focus();
+  }
+  function hideSearch(restore=false) {
+    if(restore)$('search-input').focus();
+    $('search-panel').hidden=true;
+  }
   const normalize=s=>s.toLocaleLowerCase('ko').normalize('NFKC');
+  const guideTemplate=document.createElement('template');
+  guideTemplate.innerHTML=sourcesView();
+  const searchIndex = [
+    ...chapters.map(c=>({title:c.title,source:`${c.book.title} · PDF ${c.pages[0]}–${c.pages[1]}쪽`,href:chapterHref(c),text:[c.title,c.book.title,c.book.author,c.part,c.summary,...c.points.map(p=>p.title+' '+p.text),...c.practice,...c.keywords].join(' ')})),
+    ...books.map(b=>({title:b.title,source:'자료 소개 · '+b.author,href:bookHref(b),text:[b.title,b.author,b.subtitle,b.description,b.category].filter(Boolean).join(' ')})),
+    ...books.map(b=>({title:`${b.title} · 출처 안내`,source:'자료와 읽기 안내',href:'#sources',text:[b.title,b.author,...b.notes].join(' ')})),
+    ...connectionThemes.map(t=>({title:t.title,source:'자료 사이의 연결 · 편집 해석',href:'#connections',text:[t.title,t.text,...t.items.flat()].join(' ')})),
+    {title:'서재를 읽는 방법',source:'자료와 읽기 안내',href:'#sources',text:guideTemplate.content.querySelector('.method').textContent},
+  ].map(entry=>({...entry,normalized:normalize(entry.text)}));
   function highlight(text, query) {
     const escaped=esc(text); if(!query)return escaped;
     const regex=new RegExp(esc(query).replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi');
@@ -200,9 +224,8 @@
   function search(value) {
     const query=value.trim(),q=normalize(query);
     if(!q){$('search-results').innerHTML='<p class="search-count">어떤 생각을 찾고 있나요?</p><div class="chips">'+['갈등','인정','사랑','무위','회복','언어'].map(k=>`<button class="chip" data-search="${k}">${k}</button>`).join('')+'</div>';return;}
-    const scope=$('search-scope').value;
-    const results=chapters.filter(c=>!scope||c.book.id===scope).map(c=>{const text=[c.title,c.book.title,c.part,c.summary,...c.points.map(p=>p.title+' '+p.text),...c.practice,...c.keywords].join(' ');return {c,text};}).filter(r=>normalize(r.text).includes(q));
-    $('search-results').innerHTML=`<p class="search-count">${results.length}개의 주제${results.length>80?' · 앞의 80개 표시':''}</p>`+(results.length?results.slice(0,80).map(({c,text})=>{const index=normalize(text).indexOf(q),start=Math.max(0,index-35),snippet=(start?'…':'')+text.slice(start,start+150)+(text.length>start+150?'…':'');return `<a class="search-result" href="${chapterHref(c)}"><small>${esc(c.book.title)} · PDF ${c.pages[0]}–${c.pages[1]}쪽</small><h3>${highlight(c.title,query)}</h3><p>${highlight(snippet,query)}</p></a>`;}).join(''):'<div class="empty-state"><h2>일치하는 생각이 없어요</h2><p>짧은 단어나 다른 표현으로 찾아보세요.<br>예: 사랑, 대화, 무위</p></div>');
+    const results=searchIndex.filter(entry=>entry.normalized.includes(q));
+    $('search-results').innerHTML=`<p class="search-count">${results.length}개의 검색 결과${results.length>80?' · 앞의 80개 표시':''}</p>`+(results.length?results.slice(0,80).map(({title,source,href,text,normalized})=>{const index=normalized.indexOf(q),start=Math.max(0,index-35),snippet=(start?'…':'')+text.slice(start,start+150)+(text.length>start+150?'…':'');return `<a class="search-result" href="${href}"><small>${esc(source)}</small><h3>${highlight(title,query)}</h3><p>${highlight(snippet,query)}</p></a>`;}).join(''):'<div class="empty-state"><h2>일치하는 생각이 없어요</h2><p>짧은 단어나 다른 표현으로 찾아보세요.<br>예: 사랑, 대화, 무위</p></div>');
   }
   function showSource(bookId,page) {
     const book=books.find(b=>b.id===bookId); if(!book)return;
@@ -223,26 +246,32 @@
     }catch(error){$('source-error').textContent=error.message || '파일을 읽지 못했습니다. 다시 선택해 주세요.';}
   });
   document.addEventListener('click',event=>{
+    if(!event.target.closest('#header-search'))hideSearch();
     const target=event.target.closest('button,a');if(!target)return;
     if(target.classList.contains('skip')){event.preventDefault();$('main').focus();return;}
     if(target.dataset.close){$(target.dataset.close).close();return;}
-    if(target.dataset.search!==undefined){if($('search-dialog').open){$('search-input').value=target.dataset.search;search(target.dataset.search);$('search-input').focus();}else showSearch(target.dataset.search);return;}
+    if(target.dataset.search!==undefined){showSearch(target.dataset.search);return;}
     if(target.dataset.source){showSource(target.dataset.source,Number(target.dataset.page));return;}
     if(target.dataset.save){const id=target.dataset.save,wasSaved=saved.has(id);wasSaved?saved.delete(id):saved.add(id);persist('saved',[...saved]);const scroll=window.scrollY;render();window.scrollTo(0,scroll);const replacement=document.querySelector(`[data-save="${id}"]`);if(replacement)replacement.focus({preventScroll:true});else $('main').focus({preventScroll:true});toast(wasSaved?'책갈피를 해제했습니다.':'책갈피에 생각을 담았습니다.');return;}
     if(target.dataset.finish){const id=target.dataset.finish;finished.has(id)?finished.delete(id):finished.add(id);persist('finished',[...finished]);const scroll=window.scrollY;render();window.scrollTo(0,scroll);document.querySelector(`[data-finish="${id}"]`).focus({preventScroll:true});toast(finished.has(id)?'읽은 주제로 기록했습니다.':'읽음 표시를 해제했습니다.');return;}
     if(target.dataset.font){fontSize=Math.max(15,Math.min(20,fontSize+Number(target.dataset.font)));persist('font',fontSize);document.documentElement.style.setProperty('--reading-size',`${fontSize}px`);document.querySelector('[data-font="-1"]').disabled=fontSize<=15;document.querySelector('[data-font="1"]').disabled=fontSize>=20;return;}
     if(target.hasAttribute('data-print')){window.print();return;}
-    if(target.matches('a[href^="#"]')){if($('search-dialog').open)$('search-dialog').close();if($('sidebar').classList.contains('open'))toggleMenu(false,false);if(target.hash===location.hash)$('main').focus();}
+    if(target.matches('a[href^="#"]')){hideSearch();if($('sidebar').classList.contains('open'))toggleMenu(false,false);if(target.hash===location.hash)$('main').focus();}
   });
-  $('menu-toggle').innerHTML=icon('menu');$('search-icon').innerHTML=icon('search');$('field-search-icon').innerHTML=icon('search');
-  $('menu-toggle').addEventListener('click',()=>toggleMenu(!$('sidebar').classList.contains('open')));
+  $('menu-toggle').innerHTML=icon('menu');$('search-icon').innerHTML=icon('search');
+  $('menu-toggle').addEventListener('click',()=>{hideSearch();toggleMenu(!$('sidebar').classList.contains('open'));});
   $('scrim').addEventListener('click',()=>toggleMenu(false));
-  $('search-open').addEventListener('click',()=>showSearch());
-  $('search-input').addEventListener('input',event=>search(event.target.value));
-  $('search-scope').addEventListener('change',()=>search($('search-input').value));
-  window.addEventListener('hashchange',()=>render(true));
+  $('search-form').addEventListener('submit',event=>{event.preventDefault();showSearch();});
+  $('search-input').addEventListener('focus',()=>{$('search-panel').hidden=false;search($('search-input').value);});
+  $('search-input').addEventListener('input',event=>{$('search-panel').hidden=false;search(event.target.value);});
+  $('search-input').addEventListener('click',()=>{$('search-panel').hidden=false;search($('search-input').value);});
+  $('search-close').addEventListener('click',()=>hideSearch(true));
+  $('header-search').addEventListener('focusout',event=>{if(!event.relatedTarget||!$('header-search').contains(event.relatedTarget))hideSearch();});
+  window.addEventListener('hashchange',()=>{hideSearch();render(true);});
   document.addEventListener('keydown',event=>{
-    if((event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==='k'){event.preventDefault();if(!$('search-dialog').open&&!$('source-dialog').open)showSearch();}
+    if(event.isComposing)return;
+    if((event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==='k'){event.preventDefault();if(!$('source-dialog').open)showSearch();}
+    if(event.key==='Escape'&&!$('search-panel').hidden){event.preventDefault();hideSearch(true);}
     if(event.key==='Escape'&&$('sidebar').classList.contains('open')){event.preventDefault();toggleMenu(false);}
     if(event.key==='Tab'&&$('sidebar').classList.contains('open')){const links=[...$('sidebar').querySelectorAll('a')],first=links[0],last=links.at(-1);if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}}
   });

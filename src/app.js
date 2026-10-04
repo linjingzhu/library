@@ -111,8 +111,6 @@
     route=resolveRoute();
     document.documentElement.style.setProperty('--reading-size',`${fontSize}px`);
     navigation();
-    $('search-open').setAttribute('aria-label',route.book?'이 PDF에서 검색':'서재에서 검색');
-    $('search-open').querySelector('.search-label').textContent=route.book?'이 PDF에서 검색':'서재에서 검색';
     const labels={home:'나의 라이브러리',connections:'연결된 지식',saved:'책갈피',sources:'자료와 읽기 안내',missing:'페이지를 찾을 수 없음'};
     const label=route.book?.title || labels[route.type];
     $('breadcrumb').innerHTML=`<a href="#home">나의 라이브러리</a>${route.type!=='home'?`<span>/</span>${esc(label)}`:''}`;
@@ -130,8 +128,27 @@
     document.querySelector('.workspace').inert=open;
     if(open)$('sidebar').querySelector('a').focus();else if(restore)$('menu-toggle').focus();
   }
-  function showSearch(query='') {$('search-scope').innerHTML='<option value="">모든 PDF에서 검색</option>'+books.map(b=>`<option value="${b.id}">${esc(b.title)}</option>`).join('');$('search-scope').value=route.book?.id || '';toggleMenu(false,false);$('search-dialog').showModal();$('search-input').value=query;search(query);$('search-input').focus();}
+  function showSearch(query=$('search-input').value) {
+    toggleMenu(false,false);
+    $('search-input').value=query;
+    $('search-panel').hidden=false;
+    search(query);
+    $('search-input').focus();
+  }
+  function hideSearch(restore=false) {
+    if(restore)$('search-input').focus();
+    $('search-panel').hidden=true;
+  }
   const normalize=s=>s.toLocaleLowerCase('ko').normalize('NFKC');
+  const guideTemplate=document.createElement('template');
+  guideTemplate.innerHTML=sourcesView();
+  const searchIndex = [
+    ...chapters.map(c=>({title:c.title,source:`${c.book.title} · PDF ${c.pages[0]}–${c.pages[1]}쪽`,href:chapterHref(c),text:[c.title,c.book.title,c.book.author,c.part,c.summary,...c.points.map(p=>p.title+' '+p.text),...c.practice,...c.keywords].join(' ')})),
+    ...books.map(b=>({title:b.title,source:'자료 소개 · '+b.author,href:bookHref(b),text:[b.title,b.author,b.subtitle,b.description,b.category].filter(Boolean).join(' ')})),
+    ...books.map(b=>({title:`${b.title} · 출처 안내`,source:'자료와 읽기 안내',href:'#sources',text:[b.title,b.author,...b.notes].join(' ')})),
+    ...connectionThemes.map(t=>({title:t.title,source:'자료 사이의 연결 · 편집 해석',href:'#connections',text:[t.title,t.text,...t.items.flat()].join(' ')})),
+    {title:'서재를 읽는 방법',source:'자료와 읽기 안내',href:'#sources',text:guideTemplate.content.querySelector('.method').textContent},
+  ].map(entry=>({...entry,normalized:normalize(entry.text)}));
   function highlight(text, query) {
     const escaped=esc(text); if(!query)return escaped;
     const regex=new RegExp(esc(query).replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi');
@@ -140,9 +157,8 @@
   function search(value) {
     const query=value.trim(),q=normalize(query);
     if(!q){$('search-results').innerHTML='<p class="search-count">어떤 생각을 찾고 있나요?</p><div class="chips">'+['갈등','인정','사랑','무위','회복','언어'].map(k=>`<button class="chip" data-search="${k}">${k}</button>`).join('')+'</div>';return;}
-    const scope=$('search-scope').value;
-    const results=chapters.filter(c=>!scope||c.book.id===scope).map(c=>{const text=[c.title,c.book.title,c.part,c.summary,...c.points.map(p=>p.title+' '+p.text),...c.practice,...c.keywords].join(' ');return {c,text};}).filter(r=>normalize(r.text).includes(q));
-    $('search-results').innerHTML=`<p class="search-count">${results.length}개의 주제${results.length>80?' · 앞의 80개 표시':''}</p>`+(results.length?results.slice(0,80).map(({c,text})=>{const index=normalize(text).indexOf(q),start=Math.max(0,index-35),snippet=(start?'…':'')+text.slice(start,start+150)+(text.length>start+150?'…':'');return `<a class="search-result" href="${chapterHref(c)}"><small>${esc(c.book.title)} · PDF ${c.pages[0]}–${c.pages[1]}쪽</small><h3>${highlight(c.title,query)}</h3><p>${highlight(snippet,query)}</p></a>`;}).join(''):'<div class="empty-state"><h2>일치하는 생각이 없어요</h2><p>짧은 단어나 다른 표현으로 찾아보세요.<br>예: 사랑, 대화, 무위</p></div>');
+    const results=searchIndex.filter(entry=>entry.normalized.includes(q));
+    $('search-results').innerHTML=`<p class="search-count">${results.length}개의 검색 결과${results.length>80?' · 앞의 80개 표시':''}</p>`+(results.length?results.slice(0,80).map(({title,source,href,text,normalized})=>{const index=normalized.indexOf(q),start=Math.max(0,index-35),snippet=(start?'…':'')+text.slice(start,start+150)+(text.length>start+150?'…':'');return `<a class="search-result" href="${href}"><small>${esc(source)}</small><h3>${highlight(title,query)}</h3><p>${highlight(snippet,query)}</p></a>`;}).join(''):'<div class="empty-state"><h2>일치하는 생각이 없어요</h2><p>짧은 단어나 다른 표현으로 찾아보세요.<br>예: 사랑, 대화, 무위</p></div>');
   }
   function showSource(bookId,page) {
     const book=books.find(b=>b.id===bookId); if(!book)return;
@@ -163,26 +179,32 @@
     }catch(error){$('source-error').textContent=error.message || '파일을 읽지 못했습니다. 다시 선택해 주세요.';}
   });
   document.addEventListener('click',event=>{
+    if(!event.target.closest('#header-search'))hideSearch();
     const target=event.target.closest('button,a');if(!target)return;
     if(target.classList.contains('skip')){event.preventDefault();$('main').focus();return;}
     if(target.dataset.close){$(target.dataset.close).close();return;}
-    if(target.dataset.search!==undefined){if($('search-dialog').open){$('search-input').value=target.dataset.search;search(target.dataset.search);$('search-input').focus();}else showSearch(target.dataset.search);return;}
+    if(target.dataset.search!==undefined){showSearch(target.dataset.search);return;}
     if(target.dataset.source){showSource(target.dataset.source,Number(target.dataset.page));return;}
     if(target.dataset.save){const id=target.dataset.save,wasSaved=saved.has(id);wasSaved?saved.delete(id):saved.add(id);persist('saved',[...saved]);const scroll=window.scrollY;render();window.scrollTo(0,scroll);const replacement=document.querySelector(`[data-save="${id}"]`);if(replacement)replacement.focus({preventScroll:true});else $('main').focus({preventScroll:true});toast(wasSaved?'책갈피를 해제했습니다.':'책갈피에 생각을 담았습니다.');return;}
     if(target.dataset.finish){const id=target.dataset.finish;finished.has(id)?finished.delete(id):finished.add(id);persist('finished',[...finished]);const scroll=window.scrollY;render();window.scrollTo(0,scroll);document.querySelector(`[data-finish="${id}"]`).focus({preventScroll:true});toast(finished.has(id)?'읽은 주제로 기록했습니다.':'읽음 표시를 해제했습니다.');return;}
     if(target.dataset.font){fontSize=Math.max(15,Math.min(20,fontSize+Number(target.dataset.font)));persist('font',fontSize);document.documentElement.style.setProperty('--reading-size',`${fontSize}px`);document.querySelector('[data-font="-1"]').disabled=fontSize<=15;document.querySelector('[data-font="1"]').disabled=fontSize>=20;return;}
     if(target.hasAttribute('data-print')){window.print();return;}
-    if(target.matches('a[href^="#"]')){if($('search-dialog').open)$('search-dialog').close();if($('sidebar').classList.contains('open'))toggleMenu(false,false);if(target.hash===location.hash)$('main').focus();}
+    if(target.matches('a[href^="#"]')){hideSearch();if($('sidebar').classList.contains('open'))toggleMenu(false,false);if(target.hash===location.hash)$('main').focus();}
   });
-  $('menu-toggle').innerHTML=icon('menu');$('search-icon').innerHTML=icon('search');$('field-search-icon').innerHTML=icon('search');
-  $('menu-toggle').addEventListener('click',()=>toggleMenu(!$('sidebar').classList.contains('open')));
+  $('menu-toggle').innerHTML=icon('menu');$('search-icon').innerHTML=icon('search');
+  $('menu-toggle').addEventListener('click',()=>{hideSearch();toggleMenu(!$('sidebar').classList.contains('open'));});
   $('scrim').addEventListener('click',()=>toggleMenu(false));
-  $('search-open').addEventListener('click',()=>showSearch());
-  $('search-input').addEventListener('input',event=>search(event.target.value));
-  $('search-scope').addEventListener('change',()=>search($('search-input').value));
-  window.addEventListener('hashchange',()=>render(true));
+  $('search-form').addEventListener('submit',event=>{event.preventDefault();showSearch();});
+  $('search-input').addEventListener('focus',()=>{$('search-panel').hidden=false;search($('search-input').value);});
+  $('search-input').addEventListener('input',event=>{$('search-panel').hidden=false;search(event.target.value);});
+  $('search-input').addEventListener('click',()=>{$('search-panel').hidden=false;search($('search-input').value);});
+  $('search-close').addEventListener('click',()=>hideSearch(true));
+  $('header-search').addEventListener('focusout',event=>{if(!event.relatedTarget||!$('header-search').contains(event.relatedTarget))hideSearch();});
+  window.addEventListener('hashchange',()=>{hideSearch();render(true);});
   document.addEventListener('keydown',event=>{
-    if((event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==='k'){event.preventDefault();if(!$('search-dialog').open&&!$('source-dialog').open)showSearch();}
+    if(event.isComposing)return;
+    if((event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==='k'){event.preventDefault();if(!$('source-dialog').open)showSearch();}
+    if(event.key==='Escape'&&!$('search-panel').hidden){event.preventDefault();hideSearch(true);}
     if(event.key==='Escape'&&$('sidebar').classList.contains('open')){event.preventDefault();toggleMenu(false);}
     if(event.key==='Tab'&&$('sidebar').classList.contains('open')){const links=[...$('sidebar').querySelectorAll('a')],first=links[0],last=links.at(-1);if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}}
   });
