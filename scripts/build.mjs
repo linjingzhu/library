@@ -5,6 +5,13 @@ import {loadCatalog} from './catalog.mjs';
 
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const books=await loadCatalog(path.join(root,'content'));
+for (const book of books) {
+  if (!book.coverImage) continue;
+  const bytes=await readFile(path.join(root,'assets','covers',book.coverImage));
+  const extension=path.extname(book.coverImage).slice(1);
+  const mime=extension==='jpg'?'jpeg':extension;
+  book.coverSrc=`data:image/${mime};base64,${bytes.toString('base64')}`;
+}
 const output=path.join(root,'dist');
 await mkdir(output,{recursive:true});
 const data=`window.LIBRARY = ${JSON.stringify(books).replaceAll('<','\\u003c')};\n`;

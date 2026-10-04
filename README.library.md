@@ -92,6 +92,7 @@ npm run build:pages
   "order": 40,
   "category": "분야 · 주제",
   "color": "blue",
+  "coverImage": "new-pdf.png",
   "notes": ["분석 범위와 출처 안내"],
   "chapters": []
 }
@@ -101,7 +102,10 @@ npm run build:pages
 
 ### 파일 구성
 
+표지 이미지는 `assets/covers/`에 보관하고 `coverImage`에 파일명을 지정합니다. PNG·JPEG·WebP를 지원하며 파일명에는 영문 소문자·숫자·하이픈을 사용합니다. 표지가 없으면 이 필드를 생략하면 기본 표지가 표시됩니다. 빌드 시 이미지를 데이터 URI로 포함하므로 일반 웹사이트와 독립 HTML 모두 외부 이미지 경로 없이 열립니다. 제공된 원본 비율을 유지해 책장과 자료 소개에 표시합니다.
+
 - `src/`: UI와 상호작용 원본. 외부 폰트·이미지·스크립트 의존성 없음.
+- `assets/covers/`: 사용자가 제공한 각 도서의 표지 원본.
 - `content/`: 편집 가능한 한국어 지식 데이터.
 - `scripts/build.mjs`: 데이터 결합 및 단일 HTML 생성. `dist`는 생성물이므로 직접 수정하지 않습니다.
 - `scripts/catalog.mjs`: JSON 자동 탐색, 정렬, 중복 ID·필수 필드·출처 쪽수 검증. 잘못된 자료는 게시 파일 생성 전에 빌드를 중단합니다.

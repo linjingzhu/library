@@ -27,6 +27,7 @@ export function validateCatalog(books) {
     require(Number.isInteger(book.pages) && book.pages > 0, `${book.id}: pages must be a positive integer`);
     require(book.order === undefined || Number.isFinite(book.order), `${book.id}: order must be a number`);
     require(book.category === undefined || text(book.category), `${book.id}: category must be text`);
+    require(book.coverImage === undefined || (typeof book.coverImage === 'string' && /^[a-z0-9][a-z0-9-]*\.(png|jpe?g|webp)$/.test(book.coverImage)), `${book.id}: coverImage must be a local PNG, JPEG or WebP filename`);
     require(book.color === undefined || ['blue','rose','sage'].includes(book.color), `${book.id}: color must be blue, rose or sage`);
     require(strings(book.notes), `${book.id}: notes must be a text array`);
     require(Array.isArray(book.chapters) && book.chapters.length > 0, `${book.id}: chapters required`);
