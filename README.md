@@ -1,4 +1,24 @@
-# ai-dev-rule
+# 사유의 서재 · 지식 라이브러리
+
+『행복한 커플은 어떻게 싸우는가』, 『5가지 사랑의 언어』, 『노자의 말』을 바탕으로 한 한국어 지식 라이브러리입니다. 왼쪽에서 책과 주제를 선택하고 오른쪽에서 핵심 내용, 실천 질문, 원문 쪽수를 읽습니다.
+
+**[실행 방법·기능·자료 구조 → README.library.md](README.library.md)**
+
+```sh
+npm test
+npm run build
+npm start
+```
+
+브라우저로 `http://127.0.0.1:4173`을 열거나, 생성된 `dist/library.html`을 직접 열어 사용할 수 있습니다. 외부 패키지 설치가 필요하지 않습니다.
+
+---
+
+## 저장소의 기본 AI 개발 정책
+
+아래는 이 저장소가 출발한 ai-dev-rule 템플릿의 설명입니다. 정책 파일은 기존 구성을 유지합니다.
+
+### ai-dev-rule
 
 A methodology for running AI agents as engineers on a real codebase: what a
 Manager owns, how work is decomposed, what counts as evidence, and what must be
