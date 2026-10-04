@@ -35,6 +35,7 @@ export function validateCatalog(books) {
       require(chapter && validId(chapter.id) && !chapterIds.has(chapter.id), `Invalid or duplicate chapter id: ${chapter?.id}`);
       chapterIds.add(chapter.id);
       for (const key of ['title','part','summary']) require(text(chapter[key]), `${chapter.id}: ${key} required`);
+      require(chapter.application === undefined || text(chapter.application), `${chapter.id}: application must be non-empty text`);
       const range = chapter.pages;
       require(Array.isArray(range) && range.length === 2 && range.every(Number.isInteger) && range[0] >= 1 && range[0] <= range[1] && range[1] <= book.pages, `${chapter.id}: invalid page range`);
       require(Array.isArray(chapter.points) && chapter.points.length > 0, `${chapter.id}: points required`);
