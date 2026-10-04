@@ -27,8 +27,6 @@
   let route = {type:'home'};
   let toastTimer;
   let storageWarning = false;
-  const pdfUrls = new Map();
-  let pendingSource;
   const persist = (key, value) => {
     try { localStorage.setItem(`sayeu:${key}`, JSON.stringify(value)); }
     catch { if (!storageWarning) { storageWarning = true; toast('브라우저 저장이 제한되어 이번 창에서만 유지됩니다.'); } }
@@ -72,7 +70,7 @@
   }
   function bookView(book) {
     const groups = [...new Set(book.chapters.map(c=>c.part || '핵심 내용'))];
-    return `<section class="book-hero"><div><div class="eyebrow">${category(book)}</div><h1 class="page-title">${esc(book.title)}</h1><p class="page-lede">${esc(book.description)}</p><div class="chips"><span class="chip">${esc(book.author)}</span><span class="chip">${book.chapters.length}개 학습 주제</span></div><div class="book-toolbar"><a class="primary-button" href="${chapterHref(book.chapters[0])}">${icon('book')} 첫 주제 읽기</a><button class="outline-button" data-source="${book.id}">${icon('file')}원문 PDF 연결</button></div></div>${cover(book)}</section><div class="section-heading"><h2>이 책의 지식 구조</h2><small>주제를 선택해 깊이 읽기</small></div>${groups.map(group=>`<section><h2 class="chapter-part">${esc(group)}</h2><div class="chapter-list">${book.chapters.filter(c=>(c.part||'핵심 내용')===group).map(c=>chapterCard(c,book.chapters.indexOf(c))).join('')}</div></section>`).join('')}<p class="note">${book.notes.map(esc).join('<br>')}</p>`;
+    return `<section class="book-hero"><div><div class="eyebrow">${category(book)}</div><h1 class="page-title">${esc(book.title)}</h1><p class="page-lede">${esc(book.description)}</p><div class="chips"><span class="chip">${esc(book.author)}</span><span class="chip">${book.chapters.length}개 학습 주제</span></div><div class="book-toolbar"><a class="primary-button" href="${chapterHref(book.chapters[0])}">${icon('book')} 첫 주제 읽기</a></div></div>${cover(book)}</section><div class="section-heading"><h2>이 책의 지식 구조</h2><small>주제를 선택해 깊이 읽기</small></div>${groups.map(group=>`<section><h2 class="chapter-part">${esc(group)}</h2><div class="chapter-list">${book.chapters.filter(c=>(c.part||'핵심 내용')===group).map(c=>chapterCard(c,book.chapters.indexOf(c))).join('')}</div></section>`).join('')}<p class="note">${book.notes.map(esc).join('<br>')}</p>`;
   }
   function readView(book,c) {
     const index=book.chapters.indexOf(c), previous=book.chapters[index-1],next=book.chapters[index+1];
@@ -153,31 +151,11 @@
     const results=searchIndex.filter(entry=>entry.normalized.includes(q));
     $('search-results').innerHTML=`<p class="search-count">${results.length}개의 검색 결과${results.length>80?' · 앞의 80개 표시':''}</p>`+(results.length?results.slice(0,80).map(({title,source,href,text,normalized})=>{const index=normalized.indexOf(q),start=Math.max(0,index-35),snippet=(start?'…':'')+text.slice(start,start+150)+(text.length>start+150?'…':'');return `<a class="search-result" href="${href}"><small>${esc(source)}</small><h3>${highlight(title,query)}</h3><p>${highlight(snippet,query)}</p></a>`;}).join(''):'<div class="empty-state"><h2>일치하는 생각이 없어요</h2><p>짧은 단어나 다른 표현으로 찾아보세요.<br>예: 사랑, 대화, 무위</p></div>');
   }
-  function showSource(bookId) {
-    const book=books.find(b=>b.id===bookId); if(!book)return;
-    pendingSource={book};$('source-error').textContent='';$('pdf-input').value='';
-    const connected=pdfUrls.get(bookId);
-    $('source-detail').innerHTML=`<strong>${esc(book.title)}</strong>${connected?`<p class="muted small">연결된 파일: ${esc(connected.name)}</p><a class="primary-button" href="${connected.url}" target="_blank" rel="noopener">원문 PDF 열기 ↗</a>`:`<p class="muted">이 기기에 있는 <strong>${esc(book.title)}.pdf</strong>를 선택해 원문과 함께 읽어 보세요.</p>`}`;
-    if(!$('source-dialog').open)$('source-dialog').showModal();
-  }
-  $('pdf-input').addEventListener('change',async event=>{
-    const file=event.target.files[0],request=pendingSource;if(!file||!request)return;
-    try{
-      const bytes=new Uint8Array(await file.slice(0,5).arrayBuffer());
-      if(String.fromCharCode(...bytes)!=='%PDF-')throw new Error('PDF 파일을 선택해 주세요.');
-      const old=pdfUrls.get(request.book.id);if(old)URL.revokeObjectURL(old.url);
-      pdfUrls.set(request.book.id,{url:URL.createObjectURL(file),name:file.name});
-      if(pendingSource===request)showSource(request.book.id);
-      toast('PDF가 이 창에 연결되었습니다. 원문 열기를 눌러 주세요.');
-    }catch(error){$('source-error').textContent=error.message || '파일을 읽지 못했습니다. 다시 선택해 주세요.';}
-  });
   document.addEventListener('click',event=>{
     if(!event.target.closest('#header-search'))hideSearch();
     const target=event.target.closest('button,a');if(!target)return;
     if(target.classList.contains('skip')){event.preventDefault();$('main').focus();return;}
-    if(target.dataset.close){$(target.dataset.close).close();return;}
     if(target.dataset.search!==undefined){showSearch(target.dataset.search);return;}
-    if(target.dataset.source){showSource(target.dataset.source);return;}
     if(target.dataset.save){const id=target.dataset.save,wasSaved=saved.has(id);wasSaved?saved.delete(id):saved.add(id);persist('saved',[...saved]);const scroll=window.scrollY;render();window.scrollTo(0,scroll);const replacement=document.querySelector(`[data-save="${id}"]`);if(replacement)replacement.focus({preventScroll:true});else $('main').focus({preventScroll:true});toast(wasSaved?'책갈피를 해제했습니다.':'책갈피에 생각을 담았습니다.');return;}
     if(target.dataset.font){fontSize=Math.max(15,Math.min(20,fontSize+Number(target.dataset.font)));persist('font',fontSize);document.documentElement.style.setProperty('--reading-size',`${fontSize}px`);document.querySelector('[data-font="-1"]').disabled=fontSize<=15;document.querySelector('[data-font="1"]').disabled=fontSize>=20;return;}
     if(target.hasAttribute('data-print')){window.print();return;}
@@ -195,13 +173,12 @@
   window.addEventListener('hashchange',()=>{hideSearch();render(true);});
   document.addEventListener('keydown',event=>{
     if(event.isComposing)return;
-    if((event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==='k'){event.preventDefault();if(!$('source-dialog').open)showSearch();}
+    if((event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==='k'){event.preventDefault();showSearch();}
     if(event.key==='Escape'&&!$('search-panel').hidden){event.preventDefault();hideSearch(true);}
     if(event.key==='Escape'&&$('sidebar').classList.contains('open')){event.preventDefault();toggleMenu(false);}
     if(event.key==='Tab'&&$('sidebar').classList.contains('open')){const links=[...$('sidebar').querySelectorAll('a')],first=links[0],last=links.at(-1);if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}}
   });
   window.matchMedia('(min-width:851px)').addEventListener('change',()=>toggleMenu(false,false));
-  window.addEventListener('beforeunload',()=>{for(const pdf of pdfUrls.values())URL.revokeObjectURL(pdf.url);});
   render();
   toggleMenu(false,false);
 })();
