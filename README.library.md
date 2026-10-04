@@ -16,7 +16,20 @@ npm start
 
 - `dist/index.html`: 일반 정적 웹사이트. 같은 폴더의 CSS/JS 파일과 함께 사용합니다.
 - `dist/library.html`: CSS, JavaScript, 지식 데이터를 포함한 독립 실행 파일. 브라우저로 바로 열 수 있습니다.
-- 호스팅은 `dist` 폴더만 대상으로 합니다. 배포 자동화는 포함하지 않습니다.
+- 일반 정적 호스팅에는 `dist` 폴더를 사용합니다.
+
+## GitHub Pages 배포
+
+공개 주소: https://linjingzhu.github.io/library/
+
+기존 GitHub Pages 설정인 `stable` 브랜치의 루트(`/`)에서 게시합니다. 별도 유료 서비스나 사용자 정의 Actions 워크플로 없이, 로컬에서 생성한 독립 HTML을 게시합니다.
+
+```sh
+npm test
+npm run build:pages
+```
+
+`index.html`과 `.nojekyll`은 `scripts/build.mjs --pages`로 생성하는 게시 파일입니다. 직접 수정하지 말고 `src/` 또는 `content/`를 수정한 뒤 이 명령으로 재생성합니다. 생성물과 소스를 함께 커밋하고 검토 후 `stable`에 병합하면 기존 Pages 게시 과정이 실행됩니다. 배포 완료는 GitHub Pages 상태와 실제 주소의 응답으로 확인합니다.
 
 ## 기능
 

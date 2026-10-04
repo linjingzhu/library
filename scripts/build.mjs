@@ -12,4 +12,8 @@ for(const file of ['index.html','styles.css','app.js'])await copyFile(path.join(
 const [html,css,js]=await Promise.all(['index.html','styles.css','app.js'].map(file=>readFile(path.join(root,'src',file),'utf8')));
 const standalone=html.replace('<link rel="stylesheet" href="styles.css">',()=>`<style>${css}</style>`).replace('  <script defer src="data.js"></script>','').replace('  <script defer src="app.js"></script>','').replace('</body>',()=>`<script>${data}</script><script>${js}</script></body>`);
 await writeFile(path.join(output,'library.html'),standalone);
+if(process.argv.includes('--pages')) {
+  await writeFile(path.join(root,'index.html'),standalone);
+  await writeFile(path.join(root,'.nojekyll'),'');
+}
 console.log(`Built ${books.length} books, ${books.reduce((n,b)=>n+b.chapters.length,0)} chapters into dist/`);
