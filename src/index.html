@@ -22,19 +22,22 @@
   </aside>
   <div class="workspace">
     <header class="topbar">
-      <button id="menu-toggle" class="icon-button mobile-only" aria-label="메뉴 열기" aria-controls="sidebar" aria-expanded="false"></button>
-      <div id="breadcrumb" class="breadcrumb">나의 라이브러리</div>
-      <div class="top-actions"><button id="search-open" class="search-trigger" aria-label="서재에서 검색"><span id="search-icon"></span><span class="search-label">서재에서 검색</span><kbd>Ctrl K</kbd></button><span class="avatar" aria-label="개인 서재">私</span></div>
+      <div class="header-start"><button id="menu-toggle" class="icon-button mobile-only" aria-label="메뉴 열기" aria-controls="sidebar" aria-expanded="false"></button><a class="header-title" href="#home">지식 라이브러리</a></div>
+      <div id="header-search" class="header-search">
+        <form id="search-form" role="search" aria-label="전체 자료 검색">
+          <span id="search-icon" aria-hidden="true"></span><input id="search-input" type="search" aria-label="전체 자료 검색어" aria-controls="search-panel" placeholder="모든 자료에서 검색" autocomplete="off"><button class="search-submit" type="submit" aria-label="검색 실행">검색</button><kbd aria-hidden="true">Ctrl K</kbd>
+        </form>
+        <section id="search-panel" class="search-panel" aria-label="전체 자료 검색 결과" hidden>
+          <div class="search-panel-top"><span>전체 자료 · 본문, 소개, 연결된 지식</span><button id="search-close" class="icon-button" type="button" aria-label="검색 결과 닫기">✕</button></div>
+          <div id="search-results" role="region" aria-label="검색 결과" aria-live="polite"></div>
+        </section>
+      </div>
+      <div class="top-actions"><span class="avatar" aria-label="개인 서재">私</span></div>
     </header>
+    <div id="breadcrumb" class="breadcrumb contextbar">나의 라이브러리</div>
     <main id="main" tabindex="-1"></main>
     <footer class="footer"><span>사유의 서재</span><span>지식을 모으는 곳에서, 삶을 이해하는 곳으로.</span></footer>
   </div>
-  <dialog id="search-dialog" aria-labelledby="search-title">
-    <div class="dialog-top"><h2 id="search-title">서재에서 검색</h2><button class="icon-button" data-close="search-dialog" aria-label="검색 닫기">✕</button></div>
-    <label class="search-scope-label" for="search-scope">검색 범위</label><select id="search-scope"></select>
-    <label class="search-field"><span id="field-search-icon"></span><input id="search-input" type="search" placeholder="개념, 문장, 책 제목으로 찾아보세요" autocomplete="off"></label>
-    <div id="search-results" role="region" aria-label="검색 결과" aria-live="polite"></div>
-  </dialog>
   <dialog id="source-dialog" aria-labelledby="source-title">
     <div class="dialog-top"><h2 id="source-title">원문 페이지 확인</h2><button class="icon-button" data-close="source-dialog" aria-label="원문 안내 닫기">✕</button></div>
     <div id="source-detail"></div>
