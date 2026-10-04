@@ -1,0 +1,12 @@
+{
+  "name": "sayeu-knowledge-library",
+  "version": "1.0.0",
+  "private": true,
+  "description": "세 권의 책에서 연결되는 관계와 삶의 지식",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "node --test tests/content.test.mjs",
+    "start": "node scripts/serve.mjs"
+  },
+  "engines": { "node": ">=20" }
+}
