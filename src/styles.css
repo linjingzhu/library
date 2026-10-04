@@ -20,3 +20,4 @@
 @media(max-width:1150px){.book-stage .cover-image{height:168px}}
 @media(max-width:850px){.book-stage .cover-image{height:190px}}
 @media(max-width:590px){.book-stage .cover-image{height:130px;max-width:100px}.book-hero:has(.cover-image){flex-direction:column-reverse;align-items:stretch;gap:24px}.book-hero .book-cover.cover-image{display:block;width:112px;height:auto;max-height:none;margin:0;align-self:center}}
+.knowledge-application{border-top:1px solid #d9e1cf;margin-top:20px;padding-top:18px}.knowledge-application p{font-size:calc(var(--reading-size) - 1px);line-height:2}.chapter-summary small{font-size:11px;letter-spacing:.4px}.chapter-summary{word-break:keep-all;overflow-wrap:anywhere}
