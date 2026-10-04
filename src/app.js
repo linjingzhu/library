@@ -37,23 +37,36 @@
   function toast(message) { clearTimeout(toastTimer); $('toast').textContent = message; $('toast').hidden = false; toastTimer = setTimeout(() => {$('toast').hidden = true;}, 3200); }
   const bookHref = b => `#book/${b.id}`;
   const chapterHref = c => `#read/${c.id}`;
-  const category = b => ({conflict:'관계의 기술 · 갈등과 회복',love:'사랑의 표현 · 이해와 돌봄',tao:'삶의 태도 · 비움과 균형'}[b.id]);
+  const category = b => esc(b.category || 'PDF 지식 자료');
   const sourceButton = (book, page, label) => `<button class="source-ref" data-source="${book.id}" data-page="${page}">${esc(label || `PDF ${page}쪽`)} ↗</button>`;
   function cover(book, index = books.indexOf(book)) {
-    const title = {conflict:'행복한<br>커플은<br>어떻게<br>싸우는가',love:'5가지<br>사랑의 언어',tao:'노자의 말'}[book.id];
-    return `<div class="book-cover ${book.color}" aria-hidden="true"><span class="cover-number">LIBRARY / 0${index+1}</span><span class="cover-title">${title}</span><span class="cover-art"></span><span class="cover-sub">${book.id==='tao'?'道 · 德 · 經':'UNDERSTANDING & CONNECTION'}</span></div>`;
+    const title = esc(book.title);
+    return `<div class="book-cover ${book.color || 'blue'}" aria-hidden="true"><span class="cover-number">LIBRARY / ${String(index+1).padStart(2,'0')}</span><span class="cover-title">${title}</span><span class="cover-art"></span><span class="cover-sub">READ · THINK · GROW</span></div>`;
   }
   function navItem(hash, label, glyph, active, tail='') { return `<a class="nav-item ${active?'active':''}" href="${hash}" ${active?'aria-current="page"':''}>${icon(glyph)}<span>${label}</span>${tail}</a>`; }
   function navigation() {
-    const activeBook = route.book?.id;
-    $('navigation').innerHTML = navItem('#home','서재 둘러보기','grid',route.type==='home') + navItem('#connections','연결된 지식','link',route.type==='connections') + navItem('#saved','책갈피','bookmark',route.type==='saved',`<span class="count">${saved.size.toString().padStart(2,'0')}</span>`) + '<div class="nav-label">MY COLLECTION · 세 권의 책</div>' + books.map(b => `<a class="nav-item ${activeBook===b.id?'active':''}" href="${bookHref(b)}" ${route.type==='book'&&activeBook===b.id?'aria-current="page"':''}><span class="book-dot ${b.color}"></span><span>${esc(b.title)}</span></a>${activeBook===b.id?`<div class="nav-sub" aria-label="${esc(b.title)} 목차">${b.chapters.map((c,i)=>`<a href="${chapterHref(c)}" ${route.chapter?.id===c.id?'class="active" aria-current="page"':''}>${String(i+1).padStart(2,'0')} &nbsp;${esc(c.title)}</a>`).join('')}</div>`:''}`).join('') + '<div class="nav-label">ABOUT THE LIBRARY</div>' + navItem('#sources','자료와 읽기 안내','file',route.type==='sources');
+    const activeBook = route.book;
+    const tabScroll = document.querySelector('.document-tabs')?.scrollTop || 0;
+    $('navigation').innerHTML = `<div class="library-tools">${navItem('#home','서재 둘러보기','grid',route.type==='home')}${navItem('#saved','책갈피','bookmark',route.type==='saved',`<span class="count">${saved.size}</span>`)}</div>
+      <div class="nav-label">PDF 자료 <span>${books.length}</span></div>
+      <div class="document-tabs" role="navigation" aria-label="PDF별 독립 탭">${books.map((b,i)=>`<a class="document-tab ${activeBook?.id===b.id?'active':''}" href="${bookHref(b)}" ${activeBook?.id===b.id?'aria-current="location"':''}><span class="document-number">${String(i+1).padStart(2,'0')}</span><span><strong>${esc(b.title)}</strong><small>${b.chapters.length}개 주제 · ${b.pages}쪽</small></span><span class="book-dot ${b.color || 'blue'}"></span></a>`).join('')}</div>
+      ${activeBook?`<div class="toc-heading"><span>이 PDF의 목차</span><a href="${bookHref(activeBook)}">전체 보기 ↗</a></div><div class="document-toc" role="navigation" aria-label="${esc(activeBook.title)} 목차">${activeBook.chapters.map((c,i)=>`${i===0||c.part!==activeBook.chapters[i-1].part?`<div class="toc-part">${esc(c.part)}</div>`:''}<a href="${chapterHref(c)}" ${route.chapter?.id===c.id?'class="active" aria-current="page"':''}><span>${String(i+1).padStart(2,'0')}</span>${esc(c.title)}</a>`).join('')}</div>`:'<p class="tab-guide">PDF를 선택하면 해당 자료의<br>목차와 본문이 열립니다.</p>'}
+      <div class="library-secondary">${navItem('#connections','자료 사이의 연결','link',route.type==='connections')}${navItem('#sources','자료와 읽기 안내','file',route.type==='sources')}</div>`;
+    document.querySelector('.document-tabs').scrollTop = tabScroll;
+    for (const selector of ['.document-tabs','.document-toc']) {
+      const container=document.querySelector(selector), current=container?.querySelector('.active');
+      if(!current)continue;
+      const item=current.getBoundingClientRect(), area=container.getBoundingClientRect();
+      if(item.top<area.top)container.scrollTop+=item.top-area.top;
+      else if(item.bottom>area.bottom)container.scrollTop+=item.bottom-area.bottom;
+    }
   }
   function home() {
     const trails = recent.length ? recent.slice(0,3).map(id => chapters.find(c=>c.id===id)) : books.map(b => ({...b.chapters[0],book:b}));
-    return `<section class="welcome"><div><div class="eyebrow">A SPACE FOR THOUGHT</div><h1>지식은 연결될 때,<br><em>삶의 문장이 됩니다.</em></h1><p>좋은 관계를 만드는 법부터 나답게 살아가는 태도까지.<br>세 권의 책에서 길어 올린 생각을, 나의 일상으로 가져오세요.</p></div><div class="welcome-seal" aria-hidden="true">${icon('book')}<small>READ & GROW</small></div></section>
-    <div class="stats"><div class="stat"><b>03</b><span>함께 읽는 책</span></div><div class="stat"><b>${chapters.length}</b><span>학습 주제</span></div><div class="stat"><b>${books.reduce((n,b)=>n+b.pages,0)}</b><span>원문 PDF 쪽</span></div></div>
+    return `<section class="welcome"><div><div class="eyebrow">A SPACE FOR THOUGHT</div><h1>지식은 연결될 때,<br><em>삶의 문장이 됩니다.</em></h1><p>좋은 관계를 만드는 법부터 나답게 살아가는 태도까지.<br>PDF마다 정리된 생각을, 나의 일상으로 가져오세요.</p></div><div class="welcome-seal" aria-hidden="true">${icon('book')}<small>READ & GROW</small></div></section>
+    <div class="stats"><div class="stat"><b>${String(books.length).padStart(2,'0')}</b><span>독립된 PDF 자료</span></div><div class="stat"><b>${chapters.length}</b><span>학습 주제</span></div><div class="stat"><b>${books.reduce((n,b)=>n+b.pages,0)}</b><span>원문 PDF 쪽</span></div></div>
     <section aria-labelledby="shelf-title"><div class="section-heading"><h2 id="shelf-title">나의 책장</h2><small>한 권의 생각을 깊이 들여다보기</small></div><div class="shelf">${books.map((b,i)=>`<article class="book-card"><a href="${bookHref(b)}"><div class="book-stage">${cover(b,i)}</div><div class="book-meta"><div class="book-category">${category(b)}</div><h3>${esc(b.title)}</h3><p>${esc(b.author)}</p><div class="book-detail"><span>${b.chapters.length}개 주제 &nbsp;·&nbsp; PDF ${b.pages}쪽</span>${icon('arrow')}</div></div></a></article>`).join('')}</div></section>
-    <div class="home-lower"><section class="connection-preview"><div class="tiny-label">IDEAS IN CONNECTION</div><h3>서로 다른 세 권,<br>하나로 이어지는 질문.</h3><p>우리는 어떻게 서로를 이해하고,<br>더 나은 관계와 삶을 만들어갈 수 있을까요?</p><a class="text-link" href="#connections">책 사이의 연결 발견하기 ${icon('arrow')}</a></section><section class="recent-panel"><h3>${recent.length?'이어서 읽는 생각':'이 질문에서 시작해 보세요'}</h3>${trails.map((c,i)=>`<a class="trail-link" href="${chapterHref(c)}"><span>0${i+1}</span><span>${esc(c.title)}<small>${esc(c.book.title)}</small></span></a>`).join('')}</section></div>`;
+    <div class="home-lower"><section class="connection-preview"><div class="tiny-label">IDEAS IN CONNECTION</div><h3>각자의 생각에서,<br>함께 이어지는 질문.</h3><p>우리는 어떻게 서로를 이해하고,<br>더 나은 관계와 삶을 만들어갈 수 있을까요?</p><a class="text-link" href="#connections">책 사이의 연결 발견하기 ${icon('arrow')}</a></section><section class="recent-panel"><h3>${recent.length?'이어서 읽는 생각':'이 질문에서 시작해 보세요'}</h3>${trails.map((c,i)=>`<a class="trail-link" href="${chapterHref(c)}"><span>0${i+1}</span><span>${esc(c.title)}<small>${esc(c.book.title)}</small></span></a>`).join('')}</section></div>`;
   }
   function chapterCard(c,i) {
     return `<a class="chapter-card" href="${chapterHref(c)}"><span class="chapter-index">${String(i+1).padStart(2,'0')}</span><div><h3>${esc(c.title)}</h3><p>PDF ${c.pages[0]}–${c.pages[1]}쪽 · ${c.points.length}개 핵심 항목</p></div>${finished.has(c.id)?'<span class="chapter-status" aria-label="읽음">✓</span>':''}</a>`;
@@ -78,16 +91,16 @@
     return book.chapters.find(c=>c.title.includes(term)) || book.chapters.find(c=>c.points.some(p=>(p.title+' '+p.text).includes(term))) || book.chapters[0];
   }
   function connectionsView() {
-    return `<div class="eyebrow">IDEAS IN CONNECTION</div><h1 class="page-title">책 사이에서 발견한 연결</h1><p class="page-lede">관계의 기술, 사랑의 표현, 삶의 태도.<br>다른 관점들을 함께 놓고 읽으며 나만의 이해를 만들어 보세요.</p><p class="note">아래 연결은 세 책을 바탕으로 구성한 편집자의 해석입니다. 저자들이 서로의 이론을 직접 지지하거나 동일한 주장을 했다는 뜻은 아닙니다.</p><div class="connections">${connectionThemes.map((t,i)=>`<section class="connection"><div class="tiny-label">CONNECTION 0${i+1}</div><h2>${t.title}</h2><p>${t.text}</p><div class="connection-books">${t.items.map((item,j)=>{const b=books[j],c=findConnection(b,item[0]);return `<a href="${chapterHref(c)}"><span>${esc(b.title)}</span><h3>${item[1]} ↗</h3><p>${item[2]}</p></a>`;}).join('')}</div></section>`).join('')}</div>`;
+    return `<div class="eyebrow">IDEAS IN CONNECTION</div><h1 class="page-title">책 사이에서 발견한 연결</h1><p class="page-lede">관계의 기술, 사랑의 표현, 삶의 태도.<br>다른 관점들을 함께 놓고 읽으며 나만의 이해를 만들어 보세요.</p><p class="note">아래 연결은 세 책을 바탕으로 구성한 편집자의 해석입니다. 저자들이 서로의 이론을 직접 지지하거나 동일한 주장을 했다는 뜻은 아닙니다.</p><div class="connections">${connectionThemes.map((t,i)=>`<section class="connection"><div class="tiny-label">CONNECTION 0${i+1}</div><h2>${t.title}</h2><p>${t.text}</p><div class="connection-books">${t.items.map((item,j)=>{const b=books.find(book=>book.id===['conflict','love','tao'][j]);if(!b)return '';const c=findConnection(b,item[0]);return `<a href="${chapterHref(c)}"><span>${esc(b.title)}</span><h3>${item[1]} ↗</h3><p>${item[2]}</p></a>`;}).join('')}</div></section>`).join('')}</div>`;
   }
   function savedView() {
     return `<div class="eyebrow">COLLECTED THOUGHTS</div><h1 class="page-title">다시 꺼내 읽을 생각</h1><p class="page-lede">오래 머물고 싶은 주제를 책갈피에 담아 보세요.<br>이 브라우저에서 저장한 ${saved.size}개의 생각입니다.</p>${saved.size?`<div class="saved-list">${[...saved].reverse().map(id=>{const c=chapters.find(c=>c.id===id);return `<article class="saved-item"><a href="${chapterHref(c)}"><h2>${esc(c.title)}</h2><p>${esc(c.book.title)} · PDF ${c.pages[0]}–${c.pages[1]}쪽</p></a><button class="icon-button" data-save="${c.id}" aria-label="${esc(c.title)} 책갈피 해제" aria-pressed="true">${icon('bookmark')}</button></article>`;}).join('')}</div>`:`<div class="empty-state">${icon('bookmark')}<h2>아직 담아 둔 생각이 없어요</h2><p>주제를 읽다가 오른쪽 위 책갈피를 눌러 보세요.<br>기억하고 싶은 내용을 여기서 다시 만날 수 있습니다.</p><a class="primary-button" href="#home">책장 둘러보기 ${icon('arrow')}</a></div>`}`;
   }
   function sourcesView() {
-    return `<div class="eyebrow">SOURCES & READING GUIDE</div><h1 class="page-title">자료와 읽기 안내</h1><p class="page-lede">첨부된 세 권의 PDF를 바탕으로 핵심 내용을 재서술했습니다. 책의 문장을 그대로 모으기보다, 생각의 구조를 따라 다시 읽도록 구성했습니다.</p><div class="sources-grid">${books.map(b=>`<section class="source-card"><h2>${esc(b.title)}</h2><p>${esc(b.author)}<br>원문 PDF ${b.pages}쪽 · ${b.chapters.length}개 학습 주제로 정리</p><button class="outline-button" data-source="${b.id}" data-page="1">${icon('file')}${pdfUrls.has(b.id)?'연결한 원문 열기':'이 기기의 원문 PDF 연결'}</button><p class="note">${b.notes.map(esc).join('<br>')}</p></section>`).join('')}</div><section class="method"><h2>서재를 읽는 방법</h2><p><strong>출처 페이지</strong>는 PDF 파일의 첫 페이지를 1쪽으로 센 번호입니다. 책에 인쇄된 쪽수와 다를 수 있습니다. 본문의 페이지 표기를 누른 뒤 해당 PDF를 선택하면 원문을 열 수 있습니다. PDF는 외부에 업로드되지 않습니다.</p><p><strong>핵심 요약과 본문</strong>은 첨부 자료의 내용을 주제별로 재구성한 것입니다. <strong>실천 질문과 연결된 지식</strong>은 학습을 돕기 위한 편집 제안입니다. 책에서 소개한 연구 수치, 사례, 철학적 해석은 해당 저자의 관점과 맥락 안에서 읽어 주세요.</p><p><strong>자료의 범위</strong>는 행복한 커플은 어떻게 싸우는가의 갈등 원리와 실천, 5가지 사랑의 언어의 본문·FAQ·검사 안내, 노자의 말의 001–145 항목과 해설입니다. 서재의 학습 목차는 원문의 목차와 일대일로 같지 않을 수 있습니다.</p><p><strong>스캔본 문자 인식</strong>을 거쳐 정리하고 주요 제목과 번호를 확인했습니다. 인식 오류나 요약 과정의 누락 가능성이 있으므로 원문 전체를 대신하는 자료로 보지는 마세요. 출판 정보, 참고문헌, 검사 문항 전문과 사례의 모든 세부는 재수록하지 않았습니다.</p><p><strong>책갈피와 읽기 기록</strong>은 이 브라우저에만 저장됩니다. 다른 기기와 동기화되지 않으며 브라우저 데이터를 삭제하면 기록도 사라집니다. 책장 표지는 탐색을 위한 서재 전용 디자인입니다.</p></section>`;
+    return `<div class="eyebrow">SOURCES & READING GUIDE</div><h1 class="page-title">자료와 읽기 안내</h1><p class="page-lede">등록된 ${books.length}개의 PDF를 각각 분석해 핵심 내용을 재서술했습니다. 책의 문장을 그대로 모으기보다, 생각의 구조를 따라 다시 읽도록 구성했습니다.</p><div class="sources-grid">${books.map(b=>`<section class="source-card"><h2>${esc(b.title)}</h2><p>${esc(b.author)}<br>원문 PDF ${b.pages}쪽 · ${b.chapters.length}개 학습 주제로 정리</p><button class="outline-button" data-source="${b.id}" data-page="1">${icon('file')}${pdfUrls.has(b.id)?'연결한 원문 열기':'이 기기의 원문 PDF 연결'}</button><p class="note">${b.notes.map(esc).join('<br>')}</p></section>`).join('')}</div><section class="method"><h2>서재를 읽는 방법</h2><p><strong>출처 페이지</strong>는 PDF 파일의 첫 페이지를 1쪽으로 센 번호입니다. 책에 인쇄된 쪽수와 다를 수 있습니다. 본문의 페이지 표기를 누른 뒤 해당 PDF를 선택하면 원문을 열 수 있습니다. PDF는 외부에 업로드되지 않습니다.</p><p><strong>핵심 요약과 본문</strong>은 첨부 자료의 내용을 주제별로 재구성한 것입니다. <strong>실천 질문과 연결된 지식</strong>은 학습을 돕기 위한 편집 제안입니다. 책에서 소개한 연구 수치, 사례, 철학적 해석은 해당 저자의 관점과 맥락 안에서 읽어 주세요.</p><p><strong>자료의 범위</strong>는 행복한 커플은 어떻게 싸우는가의 갈등 원리와 실천, 5가지 사랑의 언어의 본문·FAQ·검사 안내, 노자의 말의 001–145 항목과 해설입니다. 서재의 학습 목차는 원문의 목차와 일대일로 같지 않을 수 있습니다.</p><p><strong>스캔본 문자 인식</strong>을 거쳐 정리하고 주요 제목과 번호를 확인했습니다. 인식 오류나 요약 과정의 누락 가능성이 있으므로 원문 전체를 대신하는 자료로 보지는 마세요. 출판 정보, 참고문헌, 검사 문항 전문과 사례의 모든 세부는 재수록하지 않았습니다.</p><p><strong>책갈피와 읽기 기록</strong>은 이 브라우저에만 저장됩니다. 다른 기기와 동기화되지 않으며 브라우저 데이터를 삭제하면 기록도 사라집니다. 책장 표지는 탐색을 위한 서재 전용 디자인입니다.</p></section>`;
   }
   function resolveRoute() {
-    const hash=location.hash.slice(1) || 'home';
+    const hash=location.hash.slice(1) || `book/${books[0].id}`;
     const [type,id]=hash.split('/');
     if (type==='book') {const book=books.find(b=>b.id===id);if(book)return {type,book};}
     if(type==='read') {for(const book of books){const chapter=book.chapters.find(c=>c.id===id);if(chapter)return {type,book,chapter};}}
@@ -98,6 +111,8 @@
     route=resolveRoute();
     document.documentElement.style.setProperty('--reading-size',`${fontSize}px`);
     navigation();
+    $('search-open').setAttribute('aria-label',route.book?'이 PDF에서 검색':'서재에서 검색');
+    $('search-open').querySelector('.search-label').textContent=route.book?'이 PDF에서 검색':'서재에서 검색';
     const labels={home:'나의 라이브러리',connections:'연결된 지식',saved:'책갈피',sources:'자료와 읽기 안내',missing:'페이지를 찾을 수 없음'};
     const label=route.book?.title || labels[route.type];
     $('breadcrumb').innerHTML=`<a href="#home">나의 라이브러리</a>${route.type!=='home'?`<span>/</span>${esc(label)}`:''}`;
@@ -115,7 +130,7 @@
     document.querySelector('.workspace').inert=open;
     if(open)$('sidebar').querySelector('a').focus();else if(restore)$('menu-toggle').focus();
   }
-  function showSearch(query='') {toggleMenu(false,false);$('search-dialog').showModal();$('search-input').value=query;search(query);$('search-input').focus();}
+  function showSearch(query='') {$('search-scope').innerHTML='<option value="">모든 PDF에서 검색</option>'+books.map(b=>`<option value="${b.id}">${esc(b.title)}</option>`).join('');$('search-scope').value=route.book?.id || '';toggleMenu(false,false);$('search-dialog').showModal();$('search-input').value=query;search(query);$('search-input').focus();}
   const normalize=s=>s.toLocaleLowerCase('ko').normalize('NFKC');
   function highlight(text, query) {
     const escaped=esc(text); if(!query)return escaped;
@@ -125,7 +140,8 @@
   function search(value) {
     const query=value.trim(),q=normalize(query);
     if(!q){$('search-results').innerHTML='<p class="search-count">어떤 생각을 찾고 있나요?</p><div class="chips">'+['갈등','인정','사랑','무위','회복','언어'].map(k=>`<button class="chip" data-search="${k}">${k}</button>`).join('')+'</div>';return;}
-    const results=chapters.map(c=>{const text=[c.title,c.book.title,c.part,c.summary,...c.points.map(p=>p.title+' '+p.text),...c.practice,...c.keywords].join(' ');return {c,text};}).filter(r=>normalize(r.text).includes(q));
+    const scope=$('search-scope').value;
+    const results=chapters.filter(c=>!scope||c.book.id===scope).map(c=>{const text=[c.title,c.book.title,c.part,c.summary,...c.points.map(p=>p.title+' '+p.text),...c.practice,...c.keywords].join(' ');return {c,text};}).filter(r=>normalize(r.text).includes(q));
     $('search-results').innerHTML=`<p class="search-count">${results.length}개의 주제${results.length>80?' · 앞의 80개 표시':''}</p>`+(results.length?results.slice(0,80).map(({c,text})=>{const index=normalize(text).indexOf(q),start=Math.max(0,index-35),snippet=(start?'…':'')+text.slice(start,start+150)+(text.length>start+150?'…':'');return `<a class="search-result" href="${chapterHref(c)}"><small>${esc(c.book.title)} · PDF ${c.pages[0]}–${c.pages[1]}쪽</small><h3>${highlight(c.title,query)}</h3><p>${highlight(snippet,query)}</p></a>`;}).join(''):'<div class="empty-state"><h2>일치하는 생각이 없어요</h2><p>짧은 단어나 다른 표현으로 찾아보세요.<br>예: 사랑, 대화, 무위</p></div>');
   }
   function showSource(bookId,page) {
@@ -163,6 +179,7 @@
   $('scrim').addEventListener('click',()=>toggleMenu(false));
   $('search-open').addEventListener('click',()=>showSearch());
   $('search-input').addEventListener('input',event=>search(event.target.value));
+  $('search-scope').addEventListener('change',()=>search($('search-input').value));
   window.addEventListener('hashchange',()=>render(true));
   document.addEventListener('keydown',event=>{
     if((event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==='k'){event.preventDefault();if(!$('search-dialog').open&&!$('source-dialog').open)showSearch();}
