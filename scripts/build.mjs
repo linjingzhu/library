@@ -1,4 +1,4 @@
-import {readFile,writeFile,mkdir,copyFile} from 'node:fs/promises';
+import {readFile,writeFile,mkdir,copyFile,open} from 'node:fs/promises';
 import {fileURLToPath} from 'node:url';
 import path from 'node:path';
 import {loadCatalog} from './catalog.mjs';
@@ -14,6 +14,18 @@ for (const book of books) {
 }
 const output=path.join(root,'dist');
 await mkdir(output,{recursive:true});
+for (const book of books) {
+  if (!book.sourcePdf) continue;
+  const source=path.join(root,'sources','pdfs',book.sourcePdf);
+  const file=await open(source,'r');
+  try {
+    const header=Buffer.alloc(5);
+    await file.read(header,0,5,0);
+    if (header.toString()!=='%PDF-') throw new Error(`${book.id}: sourcePdf is not a PDF`);
+  } finally { await file.close(); }
+  await mkdir(path.join(output,'sources','pdfs'),{recursive:true});
+  await copyFile(source,path.join(output,'sources','pdfs',book.sourcePdf));
+}
 const data=`window.LIBRARY = ${JSON.stringify(books).replaceAll('<','\\u003c')};\n`;
 await writeFile(path.join(output,'data.js'),data);
 for(const file of ['index.html','styles.css','app.js'])await copyFile(path.join(root,'src',file),path.join(output,file));

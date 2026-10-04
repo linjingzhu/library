@@ -70,9 +70,15 @@
   function chapterCard(c,i) {
     return `<a class="chapter-card" href="${chapterHref(c)}"><span class="chapter-index">${String(i+1).padStart(2,'0')}</span><div><h3>${esc(c.title)}</h3><p>${c.points.length}개 핵심 항목</p></div></a>`;
   }
+  function sourceLink(book) {
+    if (!book.sourcePdf) return `<button class="outline-button" data-source="${book.id}">${icon('file')}원문 PDF 연결</button>`;
+    const base=location.protocol==='file:'?'https://linjingzhu.github.io/library/':location.href;
+    const url=new URL(`sources/pdfs/${book.sourcePdf}`,base).href;
+    return `<a class="outline-button" href="${esc(url)}" target="_blank" rel="noopener" aria-label="${esc(book.title)} 원문 PDF 열기 (새 탭)">${icon('file')}원문 PDF 열기 ↗</a>`;
+  }
   function bookView(book) {
     const groups = [...new Set(book.chapters.map(c=>c.part || '핵심 내용'))];
-    return `<section class="book-hero"><div><div class="eyebrow">${category(book)}</div><h1 class="page-title">${esc(book.title)}</h1><p class="page-lede">${esc(book.description)}</p><div class="chips"><span class="chip">${esc(book.author)}</span><span class="chip">${book.chapters.length}개 학습 주제</span></div><div class="book-toolbar"><a class="primary-button" href="${chapterHref(book.chapters[0])}">${icon('book')} 첫 주제 읽기</a><button class="outline-button" data-source="${book.id}">${icon('file')}원문 PDF 연결</button></div></div>${cover(book)}</section><div class="section-heading"><h2>이 책의 지식 구조</h2><small>주제를 선택해 깊이 읽기</small></div>${groups.map(group=>`<section><h2 class="chapter-part">${esc(group)}</h2><div class="chapter-list">${book.chapters.filter(c=>(c.part||'핵심 내용')===group).map(c=>chapterCard(c,book.chapters.indexOf(c))).join('')}</div></section>`).join('')}<p class="note">${book.notes.map(esc).join('<br>')}</p>`;
+    return `<section class="book-hero"><div><div class="eyebrow">${category(book)}</div><h1 class="page-title">${esc(book.title)}</h1><p class="page-lede">${esc(book.description)}</p><div class="chips"><span class="chip">${esc(book.author)}</span><span class="chip">${book.chapters.length}개 학습 주제</span></div><div class="book-toolbar"><a class="primary-button" href="${chapterHref(book.chapters[0])}">${icon('book')} 첫 주제 읽기</a>${sourceLink(book)}</div></div>${cover(book)}</section><div class="section-heading"><h2>이 책의 지식 구조</h2><small>주제를 선택해 깊이 읽기</small></div>${groups.map(group=>`<section><h2 class="chapter-part">${esc(group)}</h2><div class="chapter-list">${book.chapters.filter(c=>(c.part||'핵심 내용')===group).map(c=>chapterCard(c,book.chapters.indexOf(c))).join('')}</div></section>`).join('')}<p class="note">${book.notes.map(esc).join('<br>')}</p>`;
   }
   function readView(book,c) {
     const index=book.chapters.indexOf(c), previous=book.chapters[index-1],next=book.chapters[index+1];

@@ -1,10 +1,42 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {mkdtemp, writeFile, rm} from 'node:fs/promises';
+import {mkdtemp, writeFile, rm, readFile} from 'node:fs/promises';
+import {createHash} from 'node:crypto';
 import {tmpdir} from 'node:os';
 import path from 'node:path';
 import {loadCatalog, validateCatalog} from '../scripts/catalog.mjs';
 const books=await loadCatalog(new URL('../content/',import.meta.url));
+
+test('registered PDF sources match their manifest and original file hashes',async()=>{
+  const manifest=JSON.parse(await readFile(new URL('../sources/manifest.json',import.meta.url),'utf8'));
+  const registered=books.filter(book=>book.sourcePdf);
+  assert.equal(manifest.length,registered.length);
+  assert.equal(new Set(manifest.map(entry=>entry.id)).size,manifest.length);
+  for(const book of registered){
+    const entry=manifest.find(entry=>entry.id===book.id);
+    assert.ok(entry,`${book.id}: source manifest entry required`);
+    assert.equal(entry.file,`pdfs/${book.sourcePdf}`);
+    assert.equal(entry.content,`../content/${book.id}.json`);
+    assert.equal(entry.title,book.title);
+    assert.equal(entry.pages,book.pages);
+    const bytes=await readFile(new URL(`../sources/${entry.file}`,import.meta.url));
+    assert.equal(bytes.subarray(0,5).toString(),'%PDF-');
+    assert.equal(bytes.length,entry.bytes);
+    assert.equal(createHash('sha256').update(bytes).digest('hex'),entry.sha256);
+  }
+});
+
+test('PDF metadata allows optional local filenames and rejects paths or remote URLs',()=>{
+  const book=structuredClone(books[0]);
+  delete book.sourcePdf;
+  assert.doesNotThrow(()=>validateCatalog([book]));
+  for(const invalid of ['../private.pdf','https://example.com/book.pdf','book.png','folder/book.pdf','']){
+    book.sourcePdf=invalid;
+    assert.throws(()=>validateCatalog([book]),/sourcePdf must be a local PDF filename/);
+  }
+  book.sourcePdf='next-book-2.pdf';
+  assert.doesNotThrow(()=>validateCatalog([book]));
+});
 test('all sources have valid navigable chapters and in-range source references',()=>{
   const ids=new Set();
   for(const book of books){

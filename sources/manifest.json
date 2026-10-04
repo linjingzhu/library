@@ -1,0 +1,32 @@
+[
+  {
+    "id": "conflict",
+    "title": "행복한 커플은 어떻게 싸우는가",
+    "originalFilename": "행복한 커플은 어떻게 싸우는가.pdf",
+    "file": "pdfs/conflict.pdf",
+    "content": "../content/conflict.json",
+    "pages": 466,
+    "bytes": 70893001,
+    "sha256": "e41c83b296e61273002898f1cf336b475b10aaef722e952dfebfb73314176ba8"
+  },
+  {
+    "id": "love",
+    "title": "5가지 사랑의 언어",
+    "originalFilename": "5가지 사랑의 언어.pdf",
+    "file": "pdfs/love.pdf",
+    "content": "../content/love.json",
+    "pages": 256,
+    "bytes": 32782516,
+    "sha256": "1c05fb54fa952ec32bc95d519bbfe5afbbba4a734cf71eee60469a11e633d66e"
+  },
+  {
+    "id": "tao",
+    "title": "노자의 말",
+    "originalFilename": "노자의 말.pdf",
+    "file": "pdfs/tao.pdf",
+    "content": "../content/tao.json",
+    "pages": 230,
+    "bytes": 46619926,
+    "sha256": "4aeda0028c5cf1bb744f699825904ab6b00ed533c636235997c4b41eb973162b"
+  }
+]

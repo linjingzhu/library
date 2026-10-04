@@ -1,5 +1,6 @@
 dist/
 node_modules/
 *.pdf
+!sources/pdfs/*.pdf
 *.jsonl
 .DS_Store
