@@ -1,9 +1,10 @@
 import {readFile,writeFile,mkdir,copyFile} from 'node:fs/promises';
 import {fileURLToPath} from 'node:url';
 import path from 'node:path';
+import {loadCatalog} from './catalog.mjs';
 
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
-const books=await Promise.all(['conflict','love','tao'].map(async name=>JSON.parse(await readFile(path.join(root,'content',`${name}.json`),'utf8'))));
+const books=await loadCatalog(path.join(root,'content'));
 const output=path.join(root,'dist');
 await mkdir(output,{recursive:true});
 const data=`window.LIBRARY = ${JSON.stringify(books).replaceAll('<','\\u003c')};\n`;
