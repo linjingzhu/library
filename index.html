@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f6f7f2">
   <meta name="description" content="책마다 독립된 탭에서 핵심 지식, 기억할 문장과 실천 질문을 읽는 지식 라이브러리.">
-  <title>사유의 서재 · 지식 라이브러리</title>
+  <title>정수의 서재 · 지식 라이브러리</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='12' fill='%233c5347'/%3E%3Cpath d='M10 11h7l3 4 3-4h7v19h-7l-3 3-3-3h-7z' fill='none' stroke='%23eff3da' stroke-width='2'/%3E%3Cpath d='M20 15v18' stroke='%23eff3da' stroke-width='2'/%3E%3C/svg%3E">
   <style>@charset "UTF-8";
 :root{--paper:#fcfcf9;--sidebar:#f4f5ef;--ink:#273a31;--muted:#737b71;--line:#e4e7dc;--green:#3e5b49;--soft:#e8eedd;--serif:Georgia,"Batang","바탕",serif;--reading-size:16px;font-family:"Pretendard","Noto Sans KR","Malgun Gothic",sans-serif;color:var(--ink);background:var(--paper);font-synthesis:none}
@@ -47,7 +47,7 @@
   <aside id="sidebar" class="sidebar" aria-label="서재 탐색">
     <button class="icon-button mobile-only sidebar-close" data-close-menu aria-label="탐색 닫기">×</button>
     <div class="book-rail">
-    <a class="brand" href="#home"><span class="brand-mark" aria-hidden="true">◫</span><span>사유의 서재<small>THE THOUGHT LIBRARY</small></span></a>
+    <a class="brand" href="#home"><span class="brand-mark" aria-hidden="true">◫</span><span>정수의 서재<small>THE THOUGHT LIBRARY</small></span></a>
     <div class="sidebar-caption">나를 넓히는 작은 도서관</div>
     <div id="navigation"></div>
     <div class="sidebar-bottom"><span class="status-dot"></span>자료마다 깊어지는 사유<div>읽고, 연결하고, 삶에 적용하기.</div></div>
@@ -70,7 +70,7 @@
     </header>
     <div id="breadcrumb" class="breadcrumb contextbar">나의 라이브러리</div>
     <main id="main" tabindex="-1"></main>
-    <footer class="footer"><span>사유의 서재</span><span>지식을 모으는 곳에서, 삶을 이해하는 곳으로.</span></footer>
+    <footer class="footer"><span>정수의 서재</span><span>지식을 모으는 곳에서, 삶을 이해하는 곳으로.</span></footer>
   </div>
   <div id="toast" role="status" class="toast" hidden></div>
   <noscript>이 서재는 책 탐색과 검색을 위해 JavaScript가 필요합니다.</noscript>
@@ -200,7 +200,7 @@
     const labels={home:'나의 라이브러리',connections:'연결된 지식',saved:'책갈피',missing:'페이지를 찾을 수 없음'};
     const label=route.book?.title || labels[route.type];
     $('breadcrumb').innerHTML=`<a href="#home">나의 라이브러리</a>${route.type!=='home'?`<span>/</span>${esc(label)}`:''}`;
-    document.title=`${route.chapter?.title || label} · 사유의 서재`;
+    document.title=`${route.chapter?.title || label} · 정수의 서재`;
     const views={home,connections:connectionsView,saved:savedView,book:()=>bookView(route.book),read:()=>readView(route.book,route.chapter),missing:()=>`<div class="empty-state"><h1 class="page-title">이 생각을 찾을 수 없어요</h1><p>주소가 바뀌었거나 올바르지 않습니다. 책장에서 다시 찾아보세요.</p><a class="primary-button" href="#home">책장으로 돌아가기</a></div>`};
     $('main').innerHTML=views[route.type]();
     if(route.chapter){recent=[route.chapter.id,...recent.filter(x=>x!==route.chapter.id)].slice(0,10);persist('recent',recent);}

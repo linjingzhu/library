@@ -123,7 +123,7 @@
     const labels={home:'나의 라이브러리',connections:'연결된 지식',saved:'책갈피',missing:'페이지를 찾을 수 없음'};
     const label=route.book?.title || labels[route.type];
     $('breadcrumb').innerHTML=`<a href="#home">나의 라이브러리</a>${route.type!=='home'?`<span>/</span>${esc(label)}`:''}`;
-    document.title=`${route.chapter?.title || label} · 사유의 서재`;
+    document.title=`${route.chapter?.title || label} · 정수의 서재`;
     const views={home,connections:connectionsView,saved:savedView,book:()=>bookView(route.book),read:()=>readView(route.book,route.chapter),missing:()=>`<div class="empty-state"><h1 class="page-title">이 생각을 찾을 수 없어요</h1><p>주소가 바뀌었거나 올바르지 않습니다. 책장에서 다시 찾아보세요.</p><a class="primary-button" href="#home">책장으로 돌아가기</a></div>`};
     $('main').innerHTML=views[route.type]();
     if(route.chapter){recent=[route.chapter.id,...recent.filter(x=>x!==route.chapter.id)].slice(0,10);persist('recent',recent);}
