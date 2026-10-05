@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {mkdtemp, writeFile, rm} from 'node:fs/promises';
+import {mkdtemp, writeFile, rm, readFile} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import path from 'node:path';
 import {loadCatalog, validateCatalog} from '../scripts/catalog.mjs';
@@ -47,4 +47,23 @@ test('Tao coverage includes every numbered entry once, 001 through 145',()=>{
 });
 test('content does not contain unfinished placeholders',()=>{
   for(const b of books)assert.doesNotMatch(JSON.stringify(b),/TODO|TBD|LOREM IPSUM|undefined/i);
+});
+
+test('short quotations require exact source positions inside their topic range',()=>{
+  const fixture=structuredClone(books[0]);
+  const chapter=fixture.chapters[0];
+  chapter.quotes=[{text:'검증용 문장',page:chapter.pages[0]}];
+  assert.doesNotThrow(()=>validateCatalog([fixture]));
+  for(const invalid of [{text:'',page:chapter.pages[0]},{text:'문장',page:0},{text:'문장',page:chapter.pages[1]+1},{text:'가'.repeat(601),page:chapter.pages[0]}]){
+    chapter.quotes=[invalid];
+    assert.throws(()=>validateCatalog([fixture]),/quote/);
+  }
+  chapter.quotes=Array.from({length:3},()=>({text:'문장',page:chapter.pages[0]}));
+  assert.throws(()=>validateCatalog([fixture]),/at most two/);
+});
+
+test('reader-facing copy does not mention the source file format or upload controls',async()=>{
+  for(const book of books)assert.doesNotMatch(JSON.stringify(book),/\bPDF\b/i);
+  const ui=(await Promise.all(['app.js','index.html'].map(file=>readFile(new URL(`../src/${file}`,import.meta.url),'utf8')))).join('\n');
+  assert.doesNotMatch(ui,/\bPDF\b|type="file"|createObjectURL|data-source/i);
 });

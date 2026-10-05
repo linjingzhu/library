@@ -38,6 +38,13 @@ export function validateCatalog(books) {
       require(chapter.application === undefined || text(chapter.application), `${chapter.id}: application must be non-empty text`);
       const range = chapter.pages;
       require(Array.isArray(range) && range.length === 2 && range.every(Number.isInteger) && range[0] >= 1 && range[0] <= range[1] && range[1] <= book.pages, `${chapter.id}: invalid page range`);
+      if (chapter.quotes !== undefined) {
+        require(Array.isArray(chapter.quotes) && chapter.quotes.length <= 2, `${chapter.id}: quotes must be an array of at most two short passages`);
+        for (const quote of chapter.quotes) {
+          require(quote && text(quote.text) && quote.text.length <= 600, `${chapter.id}: quote must be non-empty and short`);
+          require(Number.isInteger(quote.page) && quote.page >= range[0] && quote.page <= range[1], `${chapter.id}: quote page must be within the chapter source range`);
+        }
+      }
       require(Array.isArray(chapter.points) && chapter.points.length > 0, `${chapter.id}: points required`);
       for (const point of chapter.points) {
         require(point && text(point.title) && text(point.text), `${chapter.id}: invalid point`);
