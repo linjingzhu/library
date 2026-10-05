@@ -16,7 +16,7 @@
   <button id="scrim" class="scrim" aria-label="메뉴 닫기" hidden></button>
   <aside id="sidebar" class="sidebar" aria-label="서재 탐색">
     <button class="icon-button mobile-only sidebar-close" data-close-menu aria-label="탐색 닫기">×</button>
-    <div class="book-rail">
+    <div id="book-rail" class="book-rail">
     <a class="brand" href="#home"><span class="brand-mark" aria-hidden="true">◫</span><span>정수의 서재<small>THE THOUGHT LIBRARY</small></span></a>
     <div class="sidebar-caption">나를 넓히는 작은 도서관</div>
     <div id="navigation"></div>
@@ -24,6 +24,8 @@
     </div>
     <section id="topic-panel" class="topic-panel" aria-label="선택한 책의 목차"></section>
   </aside>
+  <div id="book-splitter" class="panel-splitter book-splitter" role="separator" tabindex="0" aria-orientation="vertical" aria-label="책 목록 너비 조절" aria-controls="book-rail" title="드래그 또는 좌우 방향키로 너비 조절 · 두 번 클릭하면 초기화"></div>
+  <div id="topic-splitter" class="panel-splitter topic-splitter" role="separator" tabindex="0" aria-orientation="vertical" aria-label="목차 너비 조절" aria-controls="topic-panel" title="드래그 또는 좌우 방향키로 너비 조절 · 두 번 클릭하면 초기화"></div>
   <div class="workspace">
     <header class="topbar">
       <div class="header-start"><button id="menu-toggle" class="icon-button mobile-only" aria-label="메뉴 열기" aria-controls="sidebar" aria-expanded="false"></button><a class="header-title" href="#home">지식 라이브러리</a></div>

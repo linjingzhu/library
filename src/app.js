@@ -31,6 +31,70 @@
     try { localStorage.setItem(`sayeu:${key}`, JSON.stringify(value)); }
     catch { if (!storageWarning) { storageWarning = true; toast('브라우저 저장이 제한되어 이번 창에서만 유지됩니다.'); } }
   };
+  const storedWidths=readStored('panel-widths');
+  let preferredWidths=storedWidths && ['book','topic'].every(key=>Number.isFinite(storedWidths[key]))?storedWidths:null;
+  let panelWidths, panelDrag=null;
+  const desktopPanels=()=>window.matchMedia('(min-width:1051px)').matches;
+  const panelDefaults=()=>window.innerWidth<=1250?{book:210,topic:230}:{book:230,topic:250};
+  const panelBudget=()=>Math.max(360,document.documentElement.clientWidth-520);
+  const clamp=(value,min,max)=>Math.min(max,Math.max(min,value));
+  function panelLimit(kind) {
+    const other=kind==='book'?(route.book?panelWidths.topic:180):panelWidths.book;
+    return Math.min(kind==='book'?360:420,panelBudget()-other);
+  }
+  function applyPanelWidths(requested=preferredWidths || panelDefaults()) {
+    const budget=panelBudget();
+    const book=clamp(Math.round(requested.book),180,Math.min(360,budget-180));
+    const topic=clamp(Math.round(requested.topic),180,Math.min(420,budget-book));
+    panelWidths={book,topic};
+    for(const kind of ['book','topic']){
+      document.documentElement.style.setProperty(`--${kind}-rail`,`${panelWidths[kind]}px`);
+      const handle=$(`${kind}-splitter`);
+      handle.setAttribute('aria-valuemin','180');
+      handle.setAttribute('aria-valuemax',String(panelLimit(kind)));
+      handle.setAttribute('aria-valuenow',String(panelWidths[kind]));
+      handle.setAttribute('aria-valuetext',`${panelWidths[kind]}픽셀`);
+    }
+  }
+  function finishPanelDrag(save) {
+    if(!panelDrag)return;
+    const {handle,pointerId}=panelDrag;
+    panelDrag=null;
+    document.body.classList.remove('resizing-panels');
+    if(handle.hasPointerCapture(pointerId))handle.releasePointerCapture(pointerId);
+    if(save){preferredWidths={...panelWidths};persist('panel-widths',preferredWidths);}
+    else applyPanelWidths();
+  }
+  for(const kind of ['book','topic']){
+    const handle=$(`${kind}-splitter`);
+    handle.addEventListener('pointerdown',event=>{
+      if(event.button!==0 || !desktopPanels())return;
+      event.preventDefault();
+      handle.focus({preventScroll:true});
+      panelDrag={handle,pointerId:event.pointerId,kind,startX:event.clientX,startWidth:panelWidths[kind],widths:{...panelWidths}};
+      handle.setPointerCapture(event.pointerId);
+      document.body.classList.add('resizing-panels');
+    });
+    handle.addEventListener('pointermove',event=>{
+      if(!panelDrag || panelDrag.handle!==handle || panelDrag.pointerId!==event.pointerId)return;
+      const width=clamp(panelDrag.startWidth+event.clientX-panelDrag.startX,180,panelLimit(kind));
+      applyPanelWidths({...panelDrag.widths,[kind]:width});
+    });
+    handle.addEventListener('pointerup',()=>finishPanelDrag(true));
+    handle.addEventListener('pointercancel',()=>finishPanelDrag(false));
+    handle.addEventListener('lostpointercapture',()=>finishPanelDrag(false));
+    handle.addEventListener('keydown',event=>{
+      if(event.key==='Escape'){finishPanelDrag(false);return;}
+      if(!desktopPanels() || !['ArrowLeft','ArrowRight','Home','End'].includes(event.key))return;
+      event.preventDefault();
+      const delta=(event.shiftKey?30:10)*(event.key==='ArrowLeft'?-1:1);
+      const value=event.key==='Home'?180:event.key==='End'?panelLimit(kind):panelWidths[kind]+delta;
+      applyPanelWidths({...panelWidths,[kind]:clamp(value,180,panelLimit(kind))});
+      preferredWidths={...panelWidths};persist('panel-widths',preferredWidths);
+    });
+    handle.addEventListener('dblclick',()=>{finishPanelDrag(false);preferredWidths=null;persist('panel-widths',null);applyPanelWidths();});
+  }
+  window.addEventListener('resize',()=>{finishPanelDrag(false);applyPanelWidths();});
   function toast(message) { clearTimeout(toastTimer); $('toast').textContent = message; $('toast').hidden = false; toastTimer = setTimeout(() => {$('toast').hidden = true;}, 3200); }
   const bookHref = b => `#book/${b.id}`;
   const chapterHref = c => `#read/${c.id}`;
@@ -47,6 +111,7 @@
     const oldToc=document.querySelector('.document-toc');
     const tocScroll=oldToc && oldToc.dataset.book===activeBook?.id?oldToc.scrollTop:0;
     document.body.classList.toggle('has-book',Boolean(activeBook));
+    applyPanelWidths();
     $('navigation').innerHTML=`<div class="library-tools">${navItem('#home','서재 둘러보기','grid',route.type==='home')}${navItem('#saved','책갈피','bookmark',route.type==='saved',`<span class="count">${saved.size}</span>`)}</div><div class="nav-label">책 <span>${books.length}</span></div><nav class="document-tabs" aria-label="책별 탐색">${books.map((b,i)=>`<a class="document-tab ${activeBook?.id===b.id?'active':''}" href="${bookHref(b)}" ${activeBook?.id===b.id?'aria-current="location"':''}><span class="document-number">${String(i+1).padStart(2,'0')}</span><strong>${esc(b.title)}</strong><span class="depth-arrow" aria-hidden="true">›</span></a>`).join('')}</nav><div class="library-secondary">${navItem('#connections','자료 사이의 연결','link',route.type==='connections')}</div>`;
     $('topic-panel').innerHTML=activeBook?`<div class="topic-header"><div class="tiny-label">목차</div><h2>${esc(activeBook.title)}</h2><a href="${bookHref(activeBook)}">책 전체 보기 ↗</a></div><nav class="document-toc" data-book="${activeBook.id}" aria-label="${esc(activeBook.title)} 목차">${activeBook.chapters.map((c,i)=>`${i===0||c.part!==activeBook.chapters[i-1].part?`<div class="toc-part">${esc(c.part)}</div>`:''}<a href="${chapterHref(c)}" ${route.chapter?.id===c.id?'class="active" aria-current="page"':''}><span>${String(i+1).padStart(2,'0')}</span>${esc(c.title)}</a>`).join('')}</nav>`:'<p class="topic-empty">왼쪽에서 책을 선택하면<br>이곳에 목차가 나타납니다.</p>';
     const tabs=document.querySelector('.document-tabs'), toc=document.querySelector('.document-toc');
