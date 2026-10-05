@@ -54,6 +54,13 @@ npm run build:pages
 | `content/happiness.json` | 행복할 거야 이래도 되나 싶을 정도로 | 현재의 행복, 자기 존중, 사랑·이별과 관계 |
 | `content/flexibility.json` | 유연함의 힘 | 경험에서 배우는 실험·성찰·피드백과 성장 |
 | `content/nvc.json` | 비폭력대화 | 관찰·느낌·욕구·부탁, 공감과 갈등 해결 |
+| `content/confessions.json` | 고백록 | 열세 권의 회심·의지·기억·시간·창조에 관한 성찰 |
+| `content/hurt-words.json` | 나를 아프게 한 말들이 모두 진실은 아니었다 | 판단·관계·상처를 살피는 관점과 현대적 해설 |
+| `content/light-cracks.json` | 깨진 틈이 있어야 그 사이로 빛이 들어온다 | 『차라투스트라는 이렇게 말했다』 네 부의 자기 극복과 삶의 긍정 |
+| `content/nietzsche-lessons.json` | 니체 인생수업 | 66개 통찰을 묶은 자기 이해·관계·성장에 관한 지식 |
+| `content/nietzsche-words.json` | 니체의 말 | 열 가지 묶음, 001–232 전체 항목의 주제별 재구성 |
+| `content/one-life.json` | 단 한 번의 삶 | 기억·기대·변화·우연·도덕적 운과 위안 |
+| `content/daodejing.json` | 도덕경 | 81장의 도·무위·관계·통치에 관한 지식 |
 
 원문은 이미지 기반 문서이며, 로컬 문자 인식으로 내용을 읽고 목차와 본문을 대조해 핵심 내용을 재구성합니다. 페이지 번호는 **첨부 원문의 물리 페이지(첫 쪽=1)**이며 인쇄된 쪽수와 다를 수 있습니다. 내부 출처 데이터는 검증을 위해 유지하고 읽기 화면에는 쪽수를 표시하지 않습니다.
 
