@@ -40,6 +40,16 @@ import subprocess
 import sys
 from pathlib import Path
 
+# The checker owns the definition of a file a repository owns. Copying by one
+# definition while exempting by another lets a roadmap or a report written at
+# the set's home reach every repository adopted after it. The two scripts
+# travel together in `.ai/tools/`, so the import always resolves. Importing
+# would otherwise leave a compiled cache beside the checker, in whatever
+# repository the tool runs in — and the next copy would carry it on.
+sys.dont_write_bytecode = True
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from check_policy_set import INSTANCE_PATHS, is_instance, parse_front_matter  # noqa: E402
+
 SET_ROOT = Path(__file__).resolve().parents[2]
 
 # What travels into an adopting repository, and nothing else.
@@ -76,15 +86,9 @@ TEMPLATES = {
 # so copying `.ai/` over an adopted tree replaces the adopter's product names
 # with another project's — and their portability check goes on passing while
 # proving nothing, which is precisely what that file's own comment warns
-# about. The others are listed because the set shipping a file at one of these
-# paths later would silently start overwriting them.
-PRESERVED = (
-    ".ai/tools/portability-denylist.txt",
-    ".ai/PROJECT_CONTEXT.md",
-    ".ai/memory/PROJECT_LESSONS.md",
-    ".ai/ROADMAP.md",
-)
-PRESERVED_DIRS = (".ai/reports/",)
+# about. The instance files are the checker's own list, so the two cannot drift;
+# `copy_set` never writes them, and holding them here as well costs nothing.
+PRESERVED = (".ai/tools/portability-denylist.txt", *sorted(INSTANCE_PATHS))
 
 KEY_LINE = re.compile(r"^([a-z_]+):\s*(.*)$")
 PLACEHOLDER = re.compile(r"<[^>]+>")
@@ -216,13 +220,28 @@ def finish_template_copy(target: Path, name: str | None) -> list[str]:
     return notes
 
 
+def owned_by_the_target(directory: str, names: list[str]) -> list[str]:
+    """`copytree`'s ignore hook: skip every instance file at the source, and any
+    bytecode cache a Python run left there, which belongs to no repository.
+
+    `.gitkeep` is exempt. It is the set's placeholder that makes the reports
+    directory exist, not a report.
+    """
+    here = Path(directory).relative_to(SET_ROOT)
+    return [
+        n for n in names
+        if n == "__pycache__" or n.endswith(".pyc")
+        or (n != ".gitkeep" and is_instance((here / n).as_posix()))
+    ]
+
+
 def copy_set(target: Path) -> list[str]:
     copied: list[str] = []
     for name in TRAVELS:
         source = SET_ROOT / name
         destination = target / name
         if source.is_dir():
-            shutil.copytree(source, destination, dirs_exist_ok=True)
+            shutil.copytree(source, destination, dirs_exist_ok=True, ignore=owned_by_the_target)
         else:
             destination.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(source, destination)
@@ -291,7 +310,42 @@ def stale_capabilities(target: Path, kept: list[str]) -> list[str]:
     ]
 
 
-def upgrade(target: Path, refresh_capabilities: bool = False) -> tuple[list[str], list[str], str, str]:
+# The release record grows every release, while its own version moves only
+# when its rules do. An older copy with the same rules has the same version and
+# other text, and would be named as a local edit on every upgrade. Nobody edits the set's record in an adopter.
+NOT_JUDGED = (".ai/CHANGELOG.md",)
+SEMVER = re.compile(r"^(\d+)\.(\d+)\.(\d+)$")
+
+
+def version_of(text: str) -> tuple[int, ...] | None:
+    match = SEMVER.match((parse_front_matter(text) or {}).get("version", ""))
+    return tuple(int(n) for n in match.groups()) if match else None
+
+
+def local_edits(target: Path) -> list[str]:
+    """Policy documents the upgrade is about to overwrite that were edited here.
+
+    A document whose text differs from the set's is either stale or edited.
+    Stale means its version is lower. Same or higher means the change was made
+    in this repository — including by an adopter who followed the versioning
+    rule and bumped it, who must not be the one whose edit vanishes silently.
+    """
+    edits: list[str] = []
+    for source in sorted((SET_ROOT / ".ai").rglob("*.md")):
+        name = source.relative_to(SET_ROOT).as_posix()
+        here = target / name
+        if is_instance(name) or name in NOT_JUDGED or not here.is_file():
+            continue
+        theirs, ours = here.read_text(encoding="utf-8"), source.read_text(encoding="utf-8")
+        if theirs == ours:
+            continue
+        their_version, our_version = version_of(theirs), version_of(ours)
+        if their_version is None or our_version is None or their_version >= our_version:
+            edits.append(name)
+    return edits
+
+
+def upgrade(target: Path, refresh_capabilities: bool = False) -> tuple[list[str], list[str], str, str, list[str], list[str]]:
     """Refresh the set in a repository that already adopted it.
 
     Adoption and upgrade differ in one thing that matters: an upgrade runs
@@ -299,7 +353,8 @@ def upgrade(target: Path, refresh_capabilities: bool = False) -> tuple[list[str]
     before the copy and written back after, so the copy cannot quietly take
     the repository's own facts with it.
 
-    Returns (written capabilities, kept capabilities, version before, after).
+    Returns (written capabilities, kept capabilities, version before, after,
+    the preserved files the target actually had).
     """
     if not (target / ".ai" / "CORE.md").exists():
         raise SystemExit(
@@ -313,6 +368,7 @@ def upgrade(target: Path, refresh_capabilities: bool = False) -> tuple[list[str]
         if (target / name).is_file()
     }
     before = set_version(target)
+    edited = local_edits(target)
 
     copy_set(target)
     written, kept = copy_capabilities(target)
@@ -327,7 +383,7 @@ def upgrade(target: Path, refresh_capabilities: bool = False) -> tuple[list[str]
     for name, blob in held.items():
         (target / name).write_bytes(blob)
 
-    return written, kept, before, set_version(target)
+    return written, kept, before, set_version(target), sorted(held), edited
 
 
 def write_instances(target: Path, facts: dict[str, str], name: str | None, force: bool) -> list[str]:
@@ -387,11 +443,17 @@ def main(argv: list[str] | None = None) -> int:
         if args.from_template:
             raise SystemExit("--upgrade and --from-template are different jobs; run one.")
 
-        written, kept, before, after = upgrade(target, args.refresh_capabilities)
+        written, kept, before, after, had, edited = upgrade(target, args.refresh_capabilities)
         print(f"[upgrade] {target}: {before} → {after}")
-        for path in sorted(PRESERVED):
-            if (target / path).is_file():
-                print(f"[keep] {path} is this repository's; the set did not write over it")
+        for path in edited:
+            print(f"[local] {path} was edited in this repository and has been replaced "
+                  f"by the set's — read its diff before committing")
+        if edited:
+            print("        [local] cannot tell a local edit from a set change that never moved")
+            print("        its version, nor see a local edit to a document the set has also")
+            print("        bumped since. Read every flagged diff; an unflagged one may hide one too.")
+        for path in had:
+            print(f"[keep] {path} is this repository's; the set did not write over it")
         for path in written:
             print(f"[copy] {path}")
 
@@ -402,7 +464,9 @@ def main(argv: list[str] | None = None) -> int:
         if stale:
             print("        --refresh-capabilities replaces them, losing those local changes.")
 
-        print()
+        # The report above has to be read before the result below. Piped, a
+        # parent's buffer flushes at exit, after the child's output.
+        print(flush=True)
         return subprocess.run(
             [sys.executable, str(target / ".ai" / "tools" / "check_policy_set.py"), str(target)],
             check=False,
@@ -432,7 +496,7 @@ def main(argv: list[str] | None = None) -> int:
     context = target / ".ai" / "PROJECT_CONTEXT.md"
     still_open = unanswered_facts(context.read_text(encoding="utf-8")) if context.exists() else []
 
-    print()
+    print(flush=True)
     result = subprocess.run(
         [sys.executable, str(target / ".ai" / "tools" / "check_policy_set.py"), str(target)],
         check=False,
