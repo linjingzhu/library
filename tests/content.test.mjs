@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {mkdtemp, writeFile, rm, readFile} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import path from 'node:path';
-import {loadCatalog, validateCatalog} from '../scripts/catalog.mjs';
+import {loadCatalog, validateCatalog, SHELVES} from '../scripts/catalog.mjs';
 const books=await loadCatalog(new URL('../content/',import.meta.url));
 test('all sources have valid navigable chapters and in-range source references',()=>{
   const ids=new Set();
@@ -25,7 +25,7 @@ test('initial sources retain their original page and module coverage',()=>{
 test('a fourth JSON is discovered, ordered, and validated without an application change',async()=>{
   const directory=await mkdtemp(path.join(tmpdir(),'library-catalog-'));
   try {
-    const added={id:'new-pdf',title:'새 PDF',author:'저자',description:'독립 자료',pages:1,notes:[],order:5,chapters:[{id:'new-pdf-01',title:'새 주제',part:'개요',summary:'새 자료 요약',pages:[1,1],points:[{title:'개념',text:'새 설명'}],practice:[],keywords:[]}]};
+    const added={id:'new-pdf',shelf:'tech',section:'개발',title:'새 PDF',author:'저자',description:'독립 자료',pages:1,notes:[],order:5,chapters:[{id:'new-pdf-01',title:'새 주제',part:'개요',summary:'새 자료 요약',pages:[1,1],points:[{title:'개념',text:'새 설명'}],practice:[],keywords:[]}]};
     const existing=Array.from({length:3},(_,i)=>({...structuredClone(added),id:`fixture-${i}`,order:10+i,chapters:[{...structuredClone(added.chapters[0]),id:`fixture-${i}-01`}]}));
     for(const b of [...existing,added])await writeFile(path.join(directory,`${b.id}.json`),JSON.stringify(b));
     const catalog=await loadCatalog(directory);
@@ -66,4 +66,13 @@ test('reader-facing copy does not mention the source file format or upload contr
   for(const book of books)assert.doesNotMatch(JSON.stringify(book),/\bPDF\b/i);
   const ui=(await Promise.all(['app.js','index.html'].map(file=>readFile(new URL(`../src/${file}`,import.meta.url),'utf8')))).join('\n');
   assert.doesNotMatch(ui,/\bPDF\b|type="file"|createObjectURL|data-source/i);
+});
+
+test('every book sits on a known shelf, and the current library is Common · 인문',()=>{
+  assert.deepEqual(SHELVES.map(s=>s.label),['English','Electronic','Tech','Common']);
+  for(const book of books){assert.equal(book.shelf,'common',book.id);assert.equal(book.section,'인문',book.id);}
+  const fixture=structuredClone(books[0]);
+  for(const shelf of [undefined,'','humanities']){fixture.shelf=shelf;assert.throws(()=>validateCatalog([fixture]),/shelf must be one of/);}
+  fixture.shelf='english';
+  for(const section of [undefined,'  ']){fixture.section=section;assert.throws(()=>validateCatalog([fixture]),/section required/);}
 });

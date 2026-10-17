@@ -2,6 +2,14 @@ import {readdir, readFile} from 'node:fs/promises';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 
+// Top-level shelves, in tab order. A book names its shelf and its section within it.
+export const SHELVES = [
+  {id:'english', label:'English'},
+  {id:'electronic', label:'Electronic'},
+  {id:'tech', label:'Tech'},
+  {id:'common', label:'Common'},
+];
+
 export async function loadCatalog(directory) {
   if (directory instanceof URL) directory = fileURLToPath(directory);
   const files = (await readdir(directory)).filter(name => name.endsWith('.json')).sort();
@@ -24,6 +32,8 @@ export function validateCatalog(books) {
     require(book && validId(book.id) && !ids.has(book.id), `Invalid or duplicate document id: ${book?.id}`);
     ids.add(book.id);
     for (const key of ['title','author','description']) require(text(book[key]), `${book.id}: ${key} required`);
+    require(SHELVES.some(shelf => shelf.id === book.shelf), `${book.id}: shelf must be one of ${SHELVES.map(shelf => shelf.id).join(', ')}`);
+    require(text(book.section), `${book.id}: section required`);
     require(Number.isInteger(book.pages) && book.pages > 0, `${book.id}: pages must be a positive integer`);
     require(book.order === undefined || Number.isFinite(book.order), `${book.id}: order must be a number`);
     require(book.category === undefined || text(book.category), `${book.id}: category must be text`);
