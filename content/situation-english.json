@@ -1,0 +1,276 @@
+{
+  "id": "situation-english",
+  "shelf": "english",
+  "section": "상황별 학습",
+  "title": "상황별 학습",
+  "author": "정수의 서재",
+  "description": "기술 문제를 보고하고 원인을 조심스럽게 제안하는 일부터 일정 조율과 개발 요청까지, 실제 업무 상황에서 바로 쓸 수 있는 영어 표현을 익힙니다.",
+  "category": "실무 영어 · 상황별 표현",
+  "color": "sage",
+  "order": 20,
+  "notes": [
+    "이 자료는 사용자가 영어 번역을 요청했던 업무 상황과 표현을 학습용으로 재구성했습니다. 실제 이름과 세부 맥락은 일반화했습니다.",
+    "문장은 상황과 상대에 맞게 조정해 사용하세요. 특히 원인을 아직 확인하지 못했다면 확정적으로 말하지 않는 것이 중요합니다."
+  ],
+  "readerNote": "영어 표현과 한국어 해설은 실무 상황에 맞춰 재구성한 학습 자료입니다. 실제 프로젝트의 제품명, 담당자, 버전명은 필요한 경우 원래 표기를 유지하세요.",
+  "chapters": [
+    {
+      "id": "situation-issue-report",
+      "title": "문제를 발견하고 상황 설명하기",
+      "part": "문제 보고와 조사",
+      "summary": "문제를 단정하기보다 관찰한 사실을 먼저 공유하고, 상대가 확인할 수 있도록 자료와 요청을 덧붙입니다.",
+      "application": "관찰한 현상, 재현 조건, 추정 원인을 각각 구분해 전달하면 상대가 문제를 빠르게 파악할 수 있습니다.",
+      "points": [
+        {
+          "title": "관찰한 현상부터 말하기",
+          "text": "무엇이 같은지와 무엇이 다른지를 짧게 나눠 말합니다.\n- The topology is the same, but the shading looks different.\n  토폴로지는 같지만 셰이딩이 다르게 보입니다.\n- The imported mesh doesn't seem to line up quite right.\n  임포트한 메시의 형태가 예상과 조금 맞지 않는 것 같습니다."
+        },
+        {
+          "title": "의견임을 부드럽게 표시하기",
+          "text": "확인된 사실과 개인적인 판단을 구분하는 표현을 씁니다.\n- It looks like the imported mesh may be slightly misaligned.\n  임포트한 메시가 약간 어긋난 것처럼 보입니다.\n- The mesh doesn't seem to match the reference exactly.\n  메시가 기준 파일과 정확히 일치하지 않는 것 같습니다.\n- `doesn't seem to`는 단정적인 `doesn't`보다 조심스러운 관찰을 전달합니다."
+        },
+        {
+          "title": "문제를 파악해 달라고 요청하기",
+          "text": "- Could you take a look at this issue?\n  이 이슈를 한번 살펴봐 주시겠어요?\n- Could you help investigate what might be causing this?\n  원인이 무엇인지 파악하는 데 도움을 주실 수 있을까요?\n- `look into`는 조사해 보다, `take a look`은 한번 살펴보다라는 자연스러운 업무 표현입니다."
+        }
+      ],
+      "practice": [
+        "토폴로지는 같지만 그림자가 다르게 보이는 현상을 두 문장으로 보고해 보세요.",
+        "확인된 사실과 아직 추정인 원인을 나누어 말해 보세요."
+      ],
+      "keywords": [
+        "이슈 보고",
+        "관찰",
+        "shading",
+        "mesh",
+        "investigate"
+      ]
+    },
+    {
+      "id": "situation-technical-hypothesis",
+      "title": "원인을 추정하되 단정하지 않기",
+      "part": "문제 보고와 조사",
+      "summary": "원인이 확실하지 않을 때는 추측임을 표시하고, 왜 그렇게 생각하는지 구체적인 단서를 덧붙입니다.",
+      "application": "확인되지 않은 원인을 사실처럼 표현하지 말고 `might`, `could`, `I wonder if` 같은 완화 표현으로 가설을 제시합니다.",
+      "points": [
+        {
+          "title": "가능성을 조심스럽게 제시하기",
+          "text": "- I wonder if this could be related to how the vertex normals are updated.\n  버텍스 노멀 갱신 방식과 관련이 있을 수도 있을 것 같습니다.\n- Could this be related to the way vertex normals are recalculated?\n  버텍스 노멀을 다시 계산하는 방식과 관련이 있을까요?\n- `I wonder if`는 단정하지 않고 가능성을 제기할 때 유용합니다."
+        },
+        {
+          "title": "잘 모른다는 점을 솔직하게 밝히기",
+          "text": "- I'm not sure what's happening on the render engine side, so I'm only guessing that it may be a normal-related issue.\n  렌더 엔진 쪽에서 어떤 일이 있는지 확실히 몰라서, 노멀 관련 문제일 수 있다고 추측하는 정도입니다.\n- I don't know enough about the render engine issue to say for sure, so this is just a guess.\n  렌더 엔진 이슈에 대해 확실히 말할 만큼 알지는 못해, 이건 어디까지나 추측입니다.\n- `only guessing`과 `just a guess`는 가설의 확신 수준을 낮춰 줍니다."
+        },
+        {
+          "title": "관찰과 가설을 한 문단으로 연결하기",
+          "text": "- I tested the file you shared. The topology is the same, but the shadows look different. I wonder if this could be related to how the vertex normals are updated.\n  공유해 주신 파일을 테스트했습니다. 토폴로지는 같지만 그림자가 다르게 보입니다. 버텍스 노멀 갱신 방식과 관련이 있을 수도 있을 것 같습니다."
+        }
+      ],
+      "practice": [
+        "렌더 엔진의 원인을 잘 모른다는 점을 먼저 밝힌 다음, 노멀 관련 문제일 수 있다는 가설을 말해 보세요.",
+        "`I know this is caused by...`처럼 확정한 문장을 불확실성을 드러내는 표현으로 바꿔 보세요."
+      ],
+      "keywords": [
+        "추측",
+        "가설",
+        "might",
+        "could",
+        "I wonder if",
+        "vertex normals"
+      ]
+    },
+    {
+      "id": "situation-share-files",
+      "title": "파일을 첨부하고 테스트 부탁하기",
+      "part": "문제 보고와 조사",
+      "summary": "상대가 제공한 파일로 무엇을 확인했는지 알리고, 추가 자료를 공유할 때에는 그 목적을 명확하게 설명합니다.",
+      "application": "첨부 사실만 알리는 데 그치지 말고 파일을 통해 확인한 내용이나 필요한 다음 행동을 함께 적습니다.",
+      "points": [
+        {
+          "title": "공유받은 자료로 테스트했다고 알리기",
+          "text": "- I tested the file Yazan shared with me.\n  Yazan 씨가 공유해 주신 파일로 테스트해 보았습니다.\n- I tried reproducing the issue using the file you sent.\n  보내 주신 파일로 문제를 재현해 보았습니다.\n- `using the file`을 붙이면 어떤 자료를 기준으로 테스트했는지 분명해집니다."
+        },
+        {
+          "title": "파일을 보낼 때 목적 밝히기",
+          "text": "- I'll attach the file so you can take a closer look.\n  더 자세히 확인하실 수 있도록 파일을 첨부하겠습니다.\n- I've attached a file that reproduces the issue.\n  문제를 재현하는 파일을 첨부했습니다.\n- I'll share the file separately for investigation.\n  조사를 위해 파일을 별도로 공유하겠습니다."
+        },
+        {
+          "title": "테스트 결과와 요청을 이어 쓰기",
+          "text": "- I tested the file and noticed that the imported mesh doesn't quite match. I've attached it so you can investigate further.\n  파일을 테스트해 보니 임포트된 메시가 완전히 맞지 않는 점을 확인했습니다. 추가로 살펴보실 수 있도록 첨부했습니다."
+        }
+      ],
+      "practice": [
+        "공유받은 파일로 테스트했다는 문장과 발견한 현상을 이어 말해 보세요.",
+        "문제 재현 파일을 첨부했다고 알리고 상대에게 조사를 부탁해 보세요."
+      ],
+      "keywords": [
+        "파일 공유",
+        "첨부",
+        "테스트",
+        "재현",
+        "attach",
+        "reproduce"
+      ]
+    },
+    {
+      "id": "situation-propose-change",
+      "title": "개선안을 제안하고 배경 설명하기",
+      "part": "제안과 의사결정",
+      "summary": "현재 상태와 사용자의 불편, 제안하는 변경을 순서대로 설명하면 상대가 제안의 근거를 이해하기 쉽습니다.",
+      "application": "제안의 배경을 먼저 설명하고, 변경 범위와 기대 효과를 구체적으로 제시합니다.",
+      "points": [
+        {
+          "title": "현재 상태와 불편을 설명하기",
+          "text": "- CLO defaults to Screen coordinates, while MD defaults to Local.\n  CLO는 Screen 좌표를, MD는 Local 좌표를 기본값으로 사용합니다.\n- Users have reported that the current behavior can be inconvenient.\n  현재 동작이 불편하다는 사용자 의견이 있었습니다.\n- `while`은 두 제품의 차이를 간결하게 비교할 때 쓸 수 있습니다."
+        },
+        {
+          "title": "제안을 정중하게 꺼내기",
+          "text": "- I'd like to suggest changing the default coordinate mode to World for both CLO and MD.\n  CLO와 MD 모두 기본 좌표 모드를 World로 변경하는 방안을 제안하고 싶습니다.\n- Would it make sense to set World as the default in both products?\n  두 제품 모두 World를 기본값으로 설정하는 것이 어떨까요?\n- `I'd like to suggest`는 정중하고 명확한 제안입니다. `Would it make sense to...?`는 함께 검토하자는 느낌을 줍니다."
+        },
+        {
+          "title": "이전 논의가 있었다는 점을 언급하기",
+          "text": "- I understand this has been discussed several times, but no decision has been made yet.\n  이 주제가 여러 차례 논의됐지만 아직 결정되지 않은 것으로 알고 있습니다.\n- I believe this came up before, though I don't think a decision was made.\n  전에 이 이야기가 나온 것으로 기억하지만 결정되지는 않은 것 같습니다.\n- 확실하지 않은 과거 이력은 `I understand`나 `I believe`로 표현하면 단정하는 인상을 줄일 수 있습니다."
+        }
+      ],
+      "practice": [
+        "현재 두 제품의 기본 설정이 다르다는 점과 World를 기본값으로 제안하는 이유를 설명해 보세요.",
+        "과거에 논의된 적은 있지만 결정되지 않았다는 내용을 부드럽게 덧붙여 보세요."
+      ],
+      "keywords": [
+        "제안",
+        "기본 설정",
+        "coordinate mode",
+        "World",
+        "사용자 의견"
+      ]
+    },
+    {
+      "id": "situation-tradeoffs",
+      "title": "일정과 범위를 함께 조율하기",
+      "part": "제안과 의사결정",
+      "summary": "간단한 변경과 범위가 넓은 개선을 구분하고, 현실적인 일정과 함께 다뤄야 할 고려 사항을 제시합니다.",
+      "application": "변경이 간단한지와 일정이 적절한지는 별개의 질문입니다. 작업 범위와 우선순위를 구분해 설명하세요.",
+      "points": [
+        {
+          "title": "범위에 따라 일정 제안하기",
+          "text": "- Changing the default setting alone would be straightforward, but improving the gizmo itself involves several considerations.\n  기본 설정만 바꾸는 일은 간단하지만 기즈모 자체를 개선하려면 여러 가지를 고려해야 합니다.\n- 2026.2 feels too soon for a broader gizmo improvement, so I think 2027.0 would be a better target.\n  기즈모 전반을 개선하기에는 2026.2가 너무 촉박해 보여서 2027.0이 더 적절한 목표라고 생각합니다.\n- `alone`은 변경 범위를 기본 설정으로 한정하고, `broader`는 더 넓은 개선을 가리킵니다."
+        },
+        {
+          "title": "제안에 동의한다고 말하기",
+          "text": "- I agree that it would be good to address the proposed changes together.\n  제안된 변경 사항을 함께 다루는 것이 좋다는 데 동의합니다.\n- I agree with addressing these items together.\n  이 항목들을 함께 다루는 데 동의합니다.\n- `I agree that + 문장`은 의견 전체에 동의할 때, `I agree with + 명사/동명사`는 대상에 동의할 때 씁니다."
+        },
+        {
+          "title": "시간 압박을 고려하기",
+          "text": "- If you're under time pressure, we could focus on the default setting first and plan the broader improvements for a later release.\n  일정이 촉박하다면 기본 설정을 먼저 다루고 더 폭넓은 개선은 이후 버전으로 계획할 수 있습니다.\n- If the timeline is tight, we can split this into smaller steps.\n  일정이 빠듯하다면 작업을 더 작은 단계로 나눌 수 있습니다.\n- `If you're under time pressure,`는 뒤에 제안이나 대안이 이어지는 문장 첫머리 표현입니다."
+        }
+      ],
+      "practice": [
+        "기본 설정 변경은 간단하지만 기즈모 전반 개선에는 고려 사항이 많다고 설명해 보세요.",
+        "일정이 촉박하다면 일을 나누어 진행하자는 대안을 제시해 보세요."
+      ],
+      "keywords": [
+        "일정",
+        "범위",
+        "우선순위",
+        "release",
+        "time pressure"
+      ]
+    },
+    {
+      "id": "situation-request-ticket",
+      "title": "담당자를 찾고 개발 티켓 요청하기",
+      "part": "요청과 후속 조치",
+      "summary": "담당자가 불분명할 때는 직접 맡을 의사도 함께 밝히고, 논의가 진행되도록 구체적인 다음 단계를 요청합니다.",
+      "application": "상대의 선택권을 존중하면서 실행 가능한 다음 행동을 제안하면 업무 요청이 더 명확해집니다.",
+      "points": [
+        {
+          "title": "담당자가 불분명한 상황 설명하기",
+          "text": "- If it's unclear who should take this on, I can handle the implementation.\n  누가 맡아야 할지 불분명하다면 제가 구현을 맡을 수 있습니다.\n- If no one has been assigned yet, I'm happy to take this on.\n  아직 담당자가 정해지지 않았다면 제가 맡겠습니다.\n- `take this on`은 업무나 책임을 맡는다는 자연스러운 표현입니다."
+        },
+        {
+          "title": "다음 행동을 정중하게 부탁하기",
+          "text": "- Could you create a development ticket for this?\n  이 건에 대한 개발 티켓을 만들어 주실 수 있을까요?\n- Could you please create a ticket so we can track this work?\n  이 작업을 추적할 수 있도록 티켓을 만들어 주시겠어요?\n- `Could you...?`만으로도 정중합니다. `please`를 더하면 공손함을 강조하지만, 매 문장에 넣을 필요는 없습니다."
+        },
+        {
+          "title": "진행 여부를 묻기",
+          "text": "- Please let me know how you'd like to proceed.\n  어떻게 진행하면 좋을지 알려 주세요.\n- Let me know if you'd like me to take care of this.\n  제가 이 일을 맡으면 좋을지 알려 주세요.\n- 첫 문장은 상대가 방향을 정하도록 열어 둡니다. 두 번째는 내가 맡을 수 있다는 점을 다시 환기합니다."
+        }
+      ],
+      "practice": [
+        "담당자가 불분명하면 내가 구현을 맡을 수 있다고 말하고 티켓 생성을 부탁해 보세요.",
+        "상대에게 다음 진행 방향을 알려 달라고 정중하게 마무리해 보세요."
+      ],
+      "keywords": [
+        "개발 티켓",
+        "담당자",
+        "take this on",
+        "Could you",
+        "follow-up"
+      ]
+    },
+    {
+      "id": "situation-ui-warning",
+      "title": "변경 전 경고와 확인 문구 이해하기",
+      "part": "제품 문구와 확인",
+      "summary": "설정 변경으로 데이터나 키프레임이 사라질 수 있음을 알리고, 사용자가 진행 여부를 선택하도록 안내하는 표현을 익힙니다.",
+      "application": "영향을 받는 항목과 결과를 먼저 밝히고, 마지막에 진행 여부를 묻습니다.",
+      "points": [
+        {
+          "title": "변경으로 발생하는 결과 알리기",
+          "text": "- Changing the type will remove the keyframes for Puller Position (Bottom).\n  타입을 변경하면 Puller Position (Bottom)의 키프레임이 제거됩니다.\n- If you change the type, the keyframes for Puller Position (Bottom) will be removed.\n  타입을 변경하는 경우 Puller Position (Bottom)의 키프레임이 제거됩니다.\n- 첫 문장은 `Changing ...`을 주어로 써서 경고를 간결하게 전달합니다. 제품 UI에서는 보통 더 짧은 문장이 읽기 쉽습니다."
+        },
+        {
+          "title": "진행해도 되는지 확인하기",
+          "text": "- Do you want to continue?\n  계속 진행하시겠습니까?\n- Would you like to proceed?\n  진행하시겠습니까?\n- `continue`는 현재 하던 작업을 계속하는 데, `proceed`는 확인 단계를 거쳐 다음 단계로 진행하는 데 자주 씁니다."
+        },
+        {
+          "title": "경고와 확인을 한 문구로 만들기",
+          "text": "- Changing the type will remove the keyframes for Puller Position (Bottom). Do you want to continue?\n  타입을 변경하면 Puller Position (Bottom)의 키프레임이 제거됩니다. 그래도 진행하시겠습니까?"
+        }
+      ],
+      "practice": [
+        "변경 결과를 먼저 설명하고 마지막에 진행 여부를 물어보는 경고 문구를 만들어 보세요.",
+        "`continue`와 `proceed` 중 현재 작업을 이어가는 상황에 더 자연스러운 단어를 골라 보세요."
+      ],
+      "keywords": [
+        "경고 문구",
+        "확인",
+        "keyframes",
+        "continue",
+        "proceed"
+      ]
+    },
+    {
+      "id": "situation-terms",
+      "title": "용어를 묻고 이름 후보 비교하기",
+      "part": "제품 문구와 확인",
+      "summary": "단어의 기본 의미뿐 아니라 뉘앙스와 사용 맥락을 질문하면 적절한 표현이나 이름을 더 정확하게 선택할 수 있습니다.",
+      "application": "브랜드명, 제품 문구, 일반 문장에서는 자연스러움의 기준이 다르므로 사용 목적을 함께 밝혀 비교합니다.",
+      "points": [
+        {
+          "title": "단어의 의미 확인하기",
+          "text": "- What does “trivia” mean?\n  “trivia”는 무슨 뜻인가요?\n- How is “trivia” different from “general knowledge”?\n  “trivia”는 “general knowledge”와 어떻게 다른가요?\n- `What does ... mean?`은 뜻을 묻고, `How is ... different from ...?`는 뉘앙스 차이를 묻습니다."
+        },
+        {
+          "title": "이름 후보를 비교해 달라고 하기",
+          "text": "- What would be a natural name combining “trivia” and “-pedia”?\n  “trivia”와 “-pedia”를 결합하면 어떤 이름이 자연스러울까요?\n- Which option sounds more natural as a website name?\n  웹사이트 이름으로는 어떤 선택지가 더 자연스럽게 들리나요?\n- `sound natural`은 실제 표현이나 이름이 자연스럽게 느껴지는지를 묻는 말입니다."
+        },
+        {
+          "title": "사소한 지식과 폭넓은 지식의 차이",
+          "text": "- “Trivia” often refers to small but interesting facts or bits of general knowledge.\n  “Trivia”는 흥미롭지만 사소한 사실이나 잡다한 지식을 가리키는 경우가 많습니다.\n- “General knowledge” sounds broader and more neutral.\n  “General knowledge”는 더 폭넓고 중립적인 느낌을 줍니다.\n- 이름으로 쓸 때는 뜻뿐 아니라 대상 독자와 원하는 인상도 함께 고려합니다."
+        }
+      ],
+      "practice": [
+        "단어의 뜻과 비슷한 표현의 차이를 질문하는 영어 문장을 각각 만들어 보세요.",
+        "두 이름 후보 중 웹사이트 이름으로 무엇이 더 자연스러운지 물어보세요."
+      ],
+      "keywords": [
+        "어휘",
+        "뉘앙스",
+        "trivia",
+        "general knowledge",
+        "이름"
+      ]
+    }
+  ]
+}
