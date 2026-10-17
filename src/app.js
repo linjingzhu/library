@@ -27,6 +27,7 @@
   let recent = (Array.isArray(readStored('recent')) ? readStored('recent') : []).filter(id => validIds.has(id));
   let fontSize = [15,16,17,18,19,20].includes(readStored('font')) ? readStored('font') : 16;
   let route = {type:'home'};
+  const foldedParts = new Set((Array.isArray(readStored('toc-folded')) ? readStored('toc-folded') : []).filter(key => typeof key === 'string'));
   let activeShelf = shelves.find(s => s.id === readStored('shelf')) || shelves.find(s => s.id === books[0].shelf);
   let toastTimer;
   let storageWarning = false;
@@ -121,7 +122,7 @@
     $('shelf-tabs').innerHTML=shelves.map(s=>`<a class="shelf-tab ${s===activeShelf?'active':''}" href="${shelfHref(s)}" ${s===activeShelf?'aria-current="true"':''}>${esc(s.label)}</a>`).join('');
     const bookTab=b=>`<a class="document-tab ${activeBook?.id===b.id?'active':''}" href="${bookHref(b)}" ${activeBook?.id===b.id?'aria-current="location"':''}><span class="document-number">${String(shelved.indexOf(b)+1).padStart(2,'0')}</span><strong>${esc(b.title)}</strong><span class="depth-arrow" aria-hidden="true">›</span></a>`;
     $('navigation').innerHTML=`<div class="library-tools">${navItem('#home','서재 둘러보기','grid',route.type==='home')}${navItem('#saved','책갈피','bookmark',route.type==='saved',`<span class="count">${saved.size}</span>`)}</div><nav class="document-tabs" data-shelf="${activeShelf.id}" aria-label="${esc(activeShelf.label)} 책별 탐색">${shelved.length?sections.map(section=>`<div class="nav-label">${esc(section)} <span>${shelved.filter(b=>b.section===section).length}</span></div>${shelved.filter(b=>b.section===section).map(bookTab).join('')}`).join(''):`<p class="shelf-empty">${esc(activeShelf.label)} 서가에는<br>아직 책이 없습니다.</p>`}</nav><div class="library-secondary">${navItem('#connections','자료 사이의 연결','link',route.type==='connections')}</div>`;
-    $('topic-panel').innerHTML=activeBook?`<div class="topic-header"><div class="tiny-label">목차</div><h2>${esc(activeBook.title)}</h2><a href="${bookHref(activeBook)}">책 전체 보기 ↗</a></div><nav class="document-toc" data-book="${activeBook.id}" aria-label="${esc(activeBook.title)} 목차">${activeBook.chapters.map((c,i)=>`${i===0||c.part!==activeBook.chapters[i-1].part?`<div class="toc-part">${esc(c.part)}</div>`:''}<a href="${chapterHref(c)}" ${route.chapter?.id===c.id?'class="active" aria-current="page"':''}><span>${String(i+1).padStart(2,'0')}</span>${esc(c.title)}</a>`).join('')}</nav>`:'<p class="topic-empty">왼쪽에서 책을 선택하면<br>이곳에 목차가 나타납니다.</p>';
+    $('topic-panel').innerHTML=activeBook?`<div class="topic-header"><div class="tiny-label">목차</div><h2>${esc(activeBook.title)}</h2><a href="${bookHref(activeBook)}">책 전체 보기 ↗</a></div><nav class="document-toc" data-book="${activeBook.id}" aria-label="${esc(activeBook.title)} 목차">${tocGroups(activeBook)}</nav>`:'<p class="topic-empty">왼쪽에서 책을 선택하면<br>이곳에 목차가 나타납니다.</p>';
     const tabs=document.querySelector('.document-tabs'), toc=document.querySelector('.document-toc');
     requestAnimationFrame(()=>{
       if(!tabs.isConnected)return;
@@ -133,6 +134,24 @@
       revealNavigation();
     });
   }
+  function tocGroups(book) {
+    const groups=[];
+    book.chapters.forEach((c,i)=>{
+      const last=groups.at(-1);
+      if(last && last.part===c.part)last.items.push([c,i]);else groups.push({part:c.part,items:[[c,i]]});
+    });
+    return groups.map((group,index)=>{
+      const key=`${book.id}|${index}`;
+      if(route.chapter && group.items.some(([c])=>c===route.chapter))foldedParts.delete(key);
+      return `<details class="toc-group" data-fold="${esc(key)}" ${foldedParts.has(key)?'':'open'}><summary class="toc-part"><span class="toc-chevron" aria-hidden="true"></span>${esc(group.part)}</summary><div class="toc-items">${group.items.map(([c,i])=>`<a href="${chapterHref(c)}" ${route.chapter?.id===c.id?'class="active" aria-current="page"':''}><span>${String(i+1).padStart(2,'0')}</span>${esc(c.title)}</a>`).join('')}</div></details>`;
+    }).join('');
+  }
+  document.addEventListener('toggle',event=>{
+    const group=event.target;
+    if(!(group instanceof HTMLDetailsElement) || !group.classList.contains('toc-group'))return;
+    group.open?foldedParts.delete(group.dataset.fold):foldedParts.add(group.dataset.fold);
+    persist('toc-folded',[...foldedParts]);
+  },true);
   function revealNavigation() {
     for(const container of document.querySelectorAll('.document-tabs,.document-toc')){
       const current=container.querySelector('.active');
