@@ -355,7 +355,8 @@
         study.querySelectorAll('.example-item').forEach((item,i)=>item.setAttribute('aria-pressed',String(i===index)));
         const panel=study.querySelector('.example-detail');
         panel.innerHTML=exampleDetailMarkup(example);
-        panel.scrollTop=0;
+        // a jump's smooth scroll may still be running; a second reset after the next frame wins over its last step
+        panel.scrollTo({top:0,behavior:'instant'});requestAnimationFrame(()=>panel.scrollTo({top:0,behavior:'instant'}));
       }
       return;
     }
