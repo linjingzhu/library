@@ -207,7 +207,8 @@
         for(const row of rows)out.push(`<span class="ln" style="--lv:${indent>>1}">${esc(row)}</span>`);
         continue;
       }
-      out.push(`<span class="ln" style="--lv:${indent>>1}">${esc(line.trimStart())}</span>`);
+      const body = line.trimStart(), bullet = body.startsWith('- ');
+      if(body)out.push(`<span class="ln${bullet?' li':''}" style="--lv:${indent>>1}">${esc(bullet?body.slice(2):body)}</span>`);
       i++;
     }
     return out.join('');

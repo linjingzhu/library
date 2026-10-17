@@ -89,3 +89,31 @@ test('a book without page numbers is valid only when none of its chapters claim 
   delete fixture.chapters[0].pages;fixture.chapters[0].quotes=[{text:'문장',page:1}];
   assert.throws(()=>validateCatalog([fixture]),/without pages/);
 });
+
+test('grammar notes use only well-formed, consistent tables',()=>{
+  const grammar=books.find(b=>b.id==='grammar');
+  const separator=/^\|(\s*:?-{3,}:?\s*\|)+$/;
+  const cells=line=>line.trim().replace(/^\|/,'').replace(/\|$/,'').split('|').map(cell=>cell.trim());
+  for(const chapter of grammar.chapters)for(const point of chapter.points){
+    const where=`${chapter.id} · ${point.title}`;
+    const lines=point.text.split('\n');
+    for(let i=0;i<lines.length;){
+      if(!lines[i].trim().startsWith('|')){
+        assert.ok(!/ \| /.test(lines[i]),`${where}: pipe-separated line outside a table: ${lines[i].trim().slice(0,50)}`);
+        assert.ok(!/^\s*-\s*e\.g\.?,?\s*$/i.test(lines[i]),`${where}: leftover e.g. introducer`);
+        i++;continue;
+      }
+      const indent=lines[i].length-lines[i].trimStart().length,rows=[];
+      while(i<lines.length&&lines[i].trim().startsWith('|')){
+        assert.equal(lines[i].length-lines[i].trimStart().length,indent,`${where}: table rows must share one indentation`);
+        assert.ok(lines[i].trim().endsWith('|'),`${where}: table row must end with |`);
+        rows.push(lines[i].trim());i++;
+      }
+      assert.ok(rows.length>=3&&separator.test(rows[1]),`${where}: a table needs a header row, a |---| row and a body row`);
+      const head=cells(rows[0]);
+      assert.ok(head.every(Boolean),`${where}: empty header cell`);
+      for(const [index,row] of rows.entries())if(index!==1)assert.equal(cells(row).length,head.length,`${where}: column count differs in ${row.slice(0,50)}`);
+      if(head.includes('예문'))assert.deepEqual(head,['예문','해설'],`${where}: example tables use | 예문 | 해설 |`);
+    }
+  }
+});
