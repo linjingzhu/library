@@ -1,5 +1,7 @@
 {
   "id": "confessions",
+  "shelf": "common",
+  "section": "인문",
   "order": 90,
   "title": "고백록",
   "author": "아우구스티누스",

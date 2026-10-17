@@ -1,5 +1,7 @@
 {
   "id": "happiness",
+  "shelf": "common",
+  "section": "인문",
   "order": 60,
   "title": "행복할 거야 이래도 되나 싶을 정도로",
   "author": "일홍",

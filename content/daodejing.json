@@ -1,5 +1,7 @@
 {
   "id": "daodejing",
+  "shelf": "common",
+  "section": "인문",
   "order": 150,
   "title": "도덕경",
   "author": "노자",

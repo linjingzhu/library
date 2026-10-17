@@ -1,7 +1,7 @@
 import {readFile,writeFile,mkdir,copyFile} from 'node:fs/promises';
 import {fileURLToPath} from 'node:url';
 import path from 'node:path';
-import {loadCatalog} from './catalog.mjs';
+import {loadCatalog,SHELVES} from './catalog.mjs';
 
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const books=await loadCatalog(path.join(root,'content'));
@@ -14,7 +14,8 @@ for (const book of books) {
 }
 const output=path.join(root,'dist');
 await mkdir(output,{recursive:true});
-const data=`window.LIBRARY = ${JSON.stringify(books).replaceAll('<','\\u003c')};\n`;
+const json=value=>JSON.stringify(value).replaceAll('<','\\u003c');
+const data=`window.SHELVES = ${json(SHELVES)};\nwindow.LIBRARY = ${json(books)};\n`;
 await writeFile(path.join(output,'data.js'),data);
 for(const file of ['index.html','styles.css','app.js'])await copyFile(path.join(root,'src',file),path.join(output,file));
 const [html,css,js]=await Promise.all(['index.html','styles.css','app.js'].map(file=>readFile(path.join(root,'src',file),'utf8')));

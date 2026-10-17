@@ -1,6 +1,8 @@
 (() => {
   'use strict';
   const books = window.LIBRARY;
+  const shelves = window.SHELVES;
+  const shelfBooks = shelf => books.filter(b => b.shelf === shelf.id);
   const icons = {
     book: '<path d="M12 5c-3-2-7-2-10-1v15c3-1 7-1 10 1 3-2 7-2 10-1V4c-3-1-7-1-10 1Z"/><path d="M12 5v15"/>',
     grid: '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',
@@ -25,6 +27,7 @@
   let recent = (Array.isArray(readStored('recent')) ? readStored('recent') : []).filter(id => validIds.has(id));
   let fontSize = [15,16,17,18,19,20].includes(readStored('font')) ? readStored('font') : 16;
   let route = {type:'home'};
+  let activeShelf = shelves.find(s => s.id === readStored('shelf')) || shelves.find(s => s.id === books[0].shelf);
   let toastTimer;
   let storageWarning = false;
   const persist = (key, value) => {
@@ -98,6 +101,7 @@
   function toast(message) { clearTimeout(toastTimer); $('toast').textContent = message; $('toast').hidden = false; toastTimer = setTimeout(() => {$('toast').hidden = true;}, 3200); }
   const bookHref = b => `#book/${b.id}`;
   const chapterHref = c => `#read/${c.id}`;
+  const shelfHref = s => `#shelf/${s.id}`;
   const category = b => esc(b.category || '책에서 얻는 지식');
   function cover(book, index = books.indexOf(book)) {
     if (book.coverSrc) return `<img class="book-cover cover-image" src="${esc(book.coverSrc)}" alt="${esc(book.title)} 표지" decoding="async">`;
@@ -107,12 +111,16 @@
   function navItem(hash, label, glyph, active, tail='') { return `<a class="nav-item ${active?'active':''}" href="${hash}" ${active?'aria-current="page"':''}>${icon(glyph)}<span>${label}</span>${tail}</a>`; }
   function navigation() {
     const activeBook=route.book;
-    const tabScroll=document.querySelector('.document-tabs')?.scrollTop || 0;
+    const oldTabs=document.querySelector('.document-tabs');
+    const tabScroll=oldTabs && oldTabs.dataset.shelf===activeShelf.id?oldTabs.scrollTop:0;
+    const shelved=shelfBooks(activeShelf), sections=[...new Set(shelved.map(b=>b.section))];
     const oldToc=document.querySelector('.document-toc');
     const tocScroll=oldToc && oldToc.dataset.book===activeBook?.id?oldToc.scrollTop:0;
     document.body.classList.toggle('has-book',Boolean(activeBook));
     applyPanelWidths();
-    $('navigation').innerHTML=`<div class="library-tools">${navItem('#home','서재 둘러보기','grid',route.type==='home')}${navItem('#saved','책갈피','bookmark',route.type==='saved',`<span class="count">${saved.size}</span>`)}</div><div class="nav-label">책 <span>${books.length}</span></div><nav class="document-tabs" aria-label="책별 탐색">${books.map((b,i)=>`<a class="document-tab ${activeBook?.id===b.id?'active':''}" href="${bookHref(b)}" ${activeBook?.id===b.id?'aria-current="location"':''}><span class="document-number">${String(i+1).padStart(2,'0')}</span><strong>${esc(b.title)}</strong><span class="depth-arrow" aria-hidden="true">›</span></a>`).join('')}</nav><div class="library-secondary">${navItem('#connections','자료 사이의 연결','link',route.type==='connections')}</div>`;
+    $('shelf-tabs').innerHTML=shelves.map(s=>`<a class="shelf-tab ${s===activeShelf?'active':''}" href="${shelfHref(s)}" ${s===activeShelf?'aria-current="true"':''}>${esc(s.label)}</a>`).join('');
+    const bookTab=b=>`<a class="document-tab ${activeBook?.id===b.id?'active':''}" href="${bookHref(b)}" ${activeBook?.id===b.id?'aria-current="location"':''}><span class="document-number">${String(shelved.indexOf(b)+1).padStart(2,'0')}</span><strong>${esc(b.title)}</strong><span class="depth-arrow" aria-hidden="true">›</span></a>`;
+    $('navigation').innerHTML=`<div class="library-tools">${navItem('#home','서재 둘러보기','grid',route.type==='home')}${navItem('#saved','책갈피','bookmark',route.type==='saved',`<span class="count">${saved.size}</span>`)}</div><nav class="document-tabs" data-shelf="${activeShelf.id}" aria-label="${esc(activeShelf.label)} 책별 탐색">${shelved.length?sections.map(section=>`<div class="nav-label">${esc(section)} <span>${shelved.filter(b=>b.section===section).length}</span></div>${shelved.filter(b=>b.section===section).map(bookTab).join('')}`).join(''):`<p class="shelf-empty">${esc(activeShelf.label)} 서가에는<br>아직 책이 없습니다.</p>`}</nav><div class="library-secondary">${navItem('#connections','자료 사이의 연결','link',route.type==='connections')}</div>`;
     $('topic-panel').innerHTML=activeBook?`<div class="topic-header"><div class="tiny-label">목차</div><h2>${esc(activeBook.title)}</h2><a href="${bookHref(activeBook)}">책 전체 보기 ↗</a></div><nav class="document-toc" data-book="${activeBook.id}" aria-label="${esc(activeBook.title)} 목차">${activeBook.chapters.map((c,i)=>`${i===0||c.part!==activeBook.chapters[i-1].part?`<div class="toc-part">${esc(c.part)}</div>`:''}<a href="${chapterHref(c)}" ${route.chapter?.id===c.id?'class="active" aria-current="page"':''}><span>${String(i+1).padStart(2,'0')}</span>${esc(c.title)}</a>`).join('')}</nav>`:'<p class="topic-empty">왼쪽에서 책을 선택하면<br>이곳에 목차가 나타납니다.</p>';
     const tabs=document.querySelector('.document-tabs'), toc=document.querySelector('.document-toc');
     requestAnimationFrame(()=>{
@@ -138,8 +146,16 @@
     const trails = recent.length ? recent.slice(0,3).map(id => chapters.find(c=>c.id===id)) : books.slice(0,3).map(b => ({...b.chapters[0],book:b}));
     return `<section class="welcome"><div><div class="eyebrow">A SPACE FOR THOUGHT</div><h1>지식은 연결될 때,<br><em>삶의 문장이 됩니다.</em></h1><p>좋은 관계를 만드는 법부터 나답게 살아가는 태도까지.<br>책에서 얻은 생각을, 나의 일상으로 가져오세요.</p></div><div class="welcome-seal" aria-hidden="true">${icon('book')}<small>READ & GROW</small></div></section>
     <div class="stats"><div class="stat"><b>${String(books.length).padStart(2,'0')}</b><span>독립된 책</span></div><div class="stat"><b>${chapters.length}</b><span>학습 주제</span></div></div>
-    <section aria-labelledby="shelf-title"><div class="section-heading"><h2 id="shelf-title">나의 책장</h2><small>한 권의 생각을 깊이 들여다보기</small></div><div class="shelf">${books.map((b,i)=>`<article class="book-card"><a href="${bookHref(b)}"><div class="book-stage">${cover(b,i)}</div><div class="book-meta"><div class="book-category">${category(b)}</div><h3>${esc(b.title)}</h3><p>${esc(b.author)}</p><div class="book-detail"><span>${b.chapters.length}개 주제</span>${icon('arrow')}</div></div></a></article>`).join('')}</div></section>
+    <section aria-labelledby="shelf-title"><div class="section-heading"><h2 id="shelf-title">나의 책장</h2><small>한 권의 생각을 깊이 들여다보기</small></div><div class="shelf">${books.map(bookCard).join('')}</div></section>
     <div class="home-lower"><section class="connection-preview"><div class="tiny-label">IDEAS IN CONNECTION</div><h3>각자의 생각에서,<br>함께 이어지는 질문.</h3><p>우리는 어떻게 서로를 이해하고,<br>더 나은 관계와 삶을 만들어갈 수 있을까요?</p><a class="text-link" href="#connections">책 사이의 연결 발견하기 ${icon('arrow')}</a></section><section class="recent-panel"><h3>${recent.length?'이어서 읽는 생각':'이 질문에서 시작해 보세요'}</h3>${trails.map((c,i)=>`<a class="trail-link" href="${chapterHref(c)}"><span>0${i+1}</span><span>${esc(c.title)}<small>${esc(c.book.title)}</small></span></a>`).join('')}</section></div>`;
+  }
+  function bookCard(b) {
+    return `<article class="book-card"><a href="${bookHref(b)}"><div class="book-stage">${cover(b)}</div><div class="book-meta"><div class="book-category">${category(b)}</div><h3>${esc(b.title)}</h3><p>${esc(b.author)}</p><div class="book-detail"><span>${b.chapters.length}개 주제</span>${icon('arrow')}</div></div></a></article>`;
+  }
+  function shelfView(shelf) {
+    const shelved=shelfBooks(shelf), sections=[...new Set(shelved.map(b=>b.section))];
+    if(!shelved.length)return `<div class="eyebrow">SHELF</div><h1 class="page-title">${esc(shelf.label)}</h1><div class="empty-state">${icon('book')}<h2>아직 이 서가에 꽂힌 책이 없어요</h2><p>책이 추가되면 왼쪽 목록과 이곳에 나타납니다.</p><a class="primary-button" href="#home">전체 책장 둘러보기 ${icon('arrow')}</a></div>`;
+    return `<div class="eyebrow">SHELF</div><h1 class="page-title">${esc(shelf.label)}</h1><p class="page-lede">${sections.map(esc).join(' · ')} · ${shelved.length}권</p>${sections.map(section=>`<section><div class="section-heading"><h2>${esc(section)}</h2><small>${shelved.filter(b=>b.section===section).length}권</small></div><div class="shelf">${shelved.filter(b=>b.section===section).map(bookCard).join('')}</div></section>`).join('')}`;
   }
   function chapterCard(c,i) {
     return `<a class="chapter-card" href="${chapterHref(c)}"><span class="chapter-index">${String(i+1).padStart(2,'0')}</span><div><h3>${esc(c.title)}</h3><p>${c.points.length}개 핵심 항목</p></div></a>`;
@@ -177,22 +193,28 @@
     const [type,id]=hash.split('/');
     if (type==='book') {const book=books.find(b=>b.id===id);if(book)return {type,book};}
     if(type==='read') {for(const book of books){const chapter=book.chapters.find(c=>c.id===id);if(chapter)return {type,book,chapter};}}
+    if(type==='shelf') {const shelf=shelves.find(s=>s.id===id);if(shelf)return {type,shelf};}
     if(type==='sources'&&!id)return {type:'home'};
     if(['home','saved','connections'].includes(type)&&!id)return {type};
     return {type:'missing'};
   }
   function render(focus=false) {
     route=resolveRoute();
+    const shelf=route.shelf || shelves.find(s=>s.id===route.book?.shelf);
+    if(shelf && shelf!==activeShelf){activeShelf=shelf;persist('shelf',shelf.id);}
     document.documentElement.style.setProperty('--reading-size',`${fontSize}px`);
     navigation();
     const labels={home:'나의 라이브러리',connections:'연결된 지식',saved:'책갈피',missing:'페이지를 찾을 수 없음'};
-    const label=route.book?.title || labels[route.type];
-    $('breadcrumb').innerHTML=`<a href="#home">나의 라이브러리</a>${route.type!=='home'?`<span>/</span>${esc(label)}`:''}`;
+    const label=route.book?.title || route.shelf?.label || labels[route.type];
+    $('breadcrumb').innerHTML=`<a href="#home">나의 라이브러리</a>${route.book?`<span>/</span><a href="${shelfHref(activeShelf)}">${esc(activeShelf.label)}</a>`:''}${route.type!=='home'?`<span>/</span>${esc(label)}`:''}`;
     document.title=`${route.chapter?.title || label} · 정수의 서재`;
-    const views={home,connections:connectionsView,saved:savedView,book:()=>bookView(route.book),read:()=>readView(route.book,route.chapter),missing:()=>`<div class="empty-state"><h1 class="page-title">이 생각을 찾을 수 없어요</h1><p>주소가 바뀌었거나 올바르지 않습니다. 책장에서 다시 찾아보세요.</p><a class="primary-button" href="#home">책장으로 돌아가기</a></div>`};
+    const views={home,shelf:()=>shelfView(route.shelf),connections:connectionsView,saved:savedView,book:()=>bookView(route.book),read:()=>readView(route.book,route.chapter),missing:()=>`<div class="empty-state"><h1 class="page-title">이 생각을 찾을 수 없어요</h1><p>주소가 바뀌었거나 올바르지 않습니다. 책장에서 다시 찾아보세요.</p><a class="primary-button" href="#home">책장으로 돌아가기</a></div>`};
     $('main').innerHTML=views[route.type]();
     if(route.chapter){recent=[route.chapter.id,...recent.filter(x=>x!==route.chapter.id)].slice(0,10);persist('recent',recent);}
-    if(focus){window.scrollTo(0,0);if($('sidebar').classList.contains('open'))($('sidebar').querySelector('.document-tab.active') || $('sidebar').querySelector('a')).focus({preventScroll:true});else $('main').focus({preventScroll:true});}
+    if(focus){window.scrollTo(0,0);if($('sidebar').classList.contains('open'))focusSidebarCurrent();else $('main').focus({preventScroll:true});}
+  }
+  function focusSidebarCurrent() {
+    ($('sidebar').querySelector(route.type==='shelf'?'.shelf-tab.active':'.document-tab.active') || $('sidebar').querySelector('a')).focus({preventScroll:true});
   }
   function toggleMenu(open, restore=true) {
     $('sidebar').classList.toggle('open',open);$('scrim').hidden=!open;$('menu-toggle').setAttribute('aria-expanded',String(open));
@@ -240,7 +262,7 @@
     if(target.dataset.save){const id=target.dataset.save,wasSaved=saved.has(id);wasSaved?saved.delete(id):saved.add(id);persist('saved',[...saved]);const scroll=window.scrollY;render();window.scrollTo(0,scroll);const replacement=document.querySelector(`[data-save="${id}"]`);if(replacement)replacement.focus({preventScroll:true});else $('main').focus({preventScroll:true});toast(wasSaved?'책갈피를 해제했습니다.':'책갈피에 생각을 담았습니다.');return;}
     if(target.dataset.font){fontSize=Math.max(15,Math.min(20,fontSize+Number(target.dataset.font)));persist('font',fontSize);document.documentElement.style.setProperty('--reading-size',`${fontSize}px`);document.querySelector('[data-font="-1"]').disabled=fontSize<=15;document.querySelector('[data-font="1"]').disabled=fontSize>=20;return;}
     if(target.hasAttribute('data-print')){window.print();return;}
-    if(target.matches('a[href^="#"]')){hideSearch();if($('sidebar').classList.contains('open')&&!target.classList.contains('document-tab'))toggleMenu(false,false);if(target.hash===location.hash){navigation();if(!$('sidebar').classList.contains('open'))$('main').focus();else ($('sidebar').querySelector('.document-tab.active') || $('sidebar').querySelector('a')).focus({preventScroll:true});}}
+    if(target.matches('a[href^="#"]')){hideSearch();if($('sidebar').classList.contains('open')&&!target.matches('.document-tab,.shelf-tab'))toggleMenu(false,false);if(target.hash===location.hash){navigation();if(!$('sidebar').classList.contains('open'))$('main').focus();else focusSidebarCurrent();}}
   });
   $('menu-toggle').innerHTML=icon('menu');$('search-icon').innerHTML=icon('search');
   $('menu-toggle').addEventListener('click',()=>{hideSearch();toggleMenu(!$('sidebar').classList.contains('open'));});
