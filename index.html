@@ -50,7 +50,7 @@
 .reading-point .point-text .ln.li{position:relative;padding-left:calc(var(--lv,0)*1.4em + 1.1em)}.reading-point .point-text .ln.li::before{content:'•';position:absolute;left:calc(var(--lv,0)*1.4em + .1em);color:#89947e}
 
 /* Situation-based English: paired examples with focused study details. */
-.example-study{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);align-items:start;gap:20px;margin-top:28px}
+.example-study{display:grid;grid-template-columns:minmax(0,.72fr) minmax(0,1.28fr);align-items:start;gap:20px;margin-top:28px}
 .example-list,.example-detail{min-width:0;border:1px solid var(--line);border-radius:9px;background:#fff}
 .example-list{padding:20px}
 .example-list>h2{font-size:15px;font-weight:600}
@@ -77,6 +77,52 @@
 .example-muted{color:var(--muted)}
 @media(max-width:760px){.example-study{grid-template-columns:1fr}.example-detail{position:static;max-height:none;order:2}.example-list{order:1}}
 @media(prefers-reduced-motion:reduce){.example-item{scroll-behavior:auto}}
+/* Sentence detail: structured study sections. */
+.example-detail .tbl-wrap{display:block;overflow-x:auto;margin:10px 0;border:1px solid var(--line);border-radius:6px}
+.example-detail table{border-collapse:collapse;width:100%;font-size:12px;line-height:1.75;color:#556056}
+.example-detail th,.example-detail td{padding:8px 11px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line);word-break:keep-all;overflow-wrap:break-word}
+.example-detail th{background:var(--soft);color:var(--ink);font-weight:600;white-space:nowrap}
+.example-detail tbody tr:last-child td{border-bottom:0}
+.example-detail td+td,.example-detail th+th{border-left:1px solid var(--line)}
+.example-detail tbody tr:nth-child(even) td{background:#fafbf6}
+.detail-reading{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:baseline;font-family:Georgia,serif;font-size:13px;color:var(--ink)}
+.detail-reading>span,.detail-collocations>span,.detail-pattern>span,.detail-caution>span,.detail-drill-type{font:600 10px/1.6 var(--sans,inherit);letter-spacing:.3px;color:#647451;background:var(--soft);border-radius:4px;padding:1px 7px}
+.detail-nav{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+.detail-nav button{padding:4px 10px;border:1px solid var(--line);border-radius:99px;font-size:11px;background:#fcfcf9;color:#556056}
+.detail-nav button:hover{background:#edf2e6;border-color:#9bab88;color:var(--green)}
+.detail-block{border-bottom:1px solid var(--line);padding:2px 0}
+.detail-block:last-child{border-bottom:0}
+.detail-block>summary{display:flex;align-items:center;gap:8px;cursor:pointer;list-style:none;padding:13px 0;font-size:13px;font-weight:600;color:#3e5b49;user-select:none}
+.detail-block>summary::-webkit-details-marker{display:none}
+.detail-block>summary::before{content:'';flex:none;width:0;height:0;border-left:5px solid currentColor;border-top:4px solid transparent;border-bottom:4px solid transparent;transition:transform .15s}
+.detail-block[open]>summary::before{transform:rotate(90deg)}
+.detail-body{padding:0 0 14px}
+.detail-body>p,.detail-card>p{margin:0 0 8px;font-size:12px;line-height:1.9;color:#556056}
+.detail-notes{margin:6px 0 0;padding-left:18px;font-size:12px;line-height:1.9;color:#556056}
+.detail-card{padding:14px 15px;margin-bottom:10px;border:1px solid var(--line);border-radius:7px;background:#fcfcf9}
+.detail-card h4{display:flex;align-items:baseline;gap:8px;margin:0 0 6px;font-size:14px;color:var(--ink)}
+.detail-card h4 small{font-size:11px;font-weight:500;color:var(--muted)}
+.detail-meaning{font-weight:600;color:var(--ink)!important}
+.detail-collocations{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center;margin:4px 0 8px}
+.detail-chips{display:flex;flex-wrap:wrap;gap:5px;margin:0;padding:0;list-style:none}
+.detail-chips li{padding:1px 9px;border:1px solid #d6decb;border-radius:99px;font:12px/1.7 Georgia,serif;color:#445244;background:#fff}
+.detail-example{display:block;padding:8px 11px;margin-top:6px;border-left:3px solid #b8c7a5;background:#f6f8f1;border-radius:0 5px 5px 0}
+.detail-example>span{display:block;font-size:12px;line-height:1.8}
+.detail-example>span:first-child{font-family:Georgia,serif;color:var(--ink)}
+.detail-example-ko{color:var(--muted)}
+.detail-pattern,.detail-caution{display:flex;gap:8px;align-items:baseline;margin:8px 0!important}
+.detail-pattern code{font:12px/1.7 ui-monospace,Menlo,Consolas,monospace;color:#3e5b49;background:#eef2e6;padding:1px 7px;border-radius:4px}
+.detail-caution{padding:7px 10px;border-radius:5px;background:#fbf3e8}
+.detail-caution>span{color:#8a5a1f;background:#f3e3c9}
+.detail-drills{margin:0;padding:0;list-style:none}
+.detail-drill{padding:12px 14px;margin-bottom:9px;border:1px solid var(--line);border-radius:7px;background:#fcfcf9}
+.detail-drill>p{margin:6px 0 8px;font-size:13px;line-height:1.8;color:var(--ink)}
+.detail-drill details>summary{cursor:pointer;font-size:12px;color:#3e5b49;font-weight:600}
+.detail-drill details p{margin:6px 0 0;font-size:12px;line-height:1.9;color:#556056}
+.detail-answer{font-family:Georgia,serif;color:var(--ink)!important;font-weight:600}
+@media(prefers-reduced-motion:reduce){.detail-block>summary::before{transition:none}}
+@media print{.example-detail{position:static;max-height:none;overflow:visible}.detail-nav{display:none}}
+
 </style>
 
 
@@ -309,6 +355,7 @@ window.LIBRARY = [{"order":10,"category":"관계의 기술 · 갈등과 회복",
   }
   const tableCells = line => line.trim().replace(/^\|/,'').replace(/\|$/,'').split('|').map(cell => cell.trim());
   const tableSeparator = /^\|(\s*:?-{3,}:?\s*\|)+$/;
+  const htmlTable = (head, body, label='') => `<div class="tbl-wrap"${label?` role="group" aria-label="${esc(label)}"`:''}><table><thead><tr>${head.map(cell=>`<th>${esc(cell)}</th>`).join('')}</tr></thead><tbody>${body.map(row=>`<tr>${row.map(cell=>`<td>${esc(cell)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
   function pointTable(rows, indent) {
     const [head, , ...body] = rows;
     return `<span class="tbl-wrap" style="--lv:${indent>>1}"><table><thead><tr>${tableCells(head).map(cell=>`<th>${esc(cell)}</th>`).join('')}</tr></thead><tbody>${body.map(row=>`<tr>${tableCells(row).map(cell=>`<td>${esc(cell)}</td>`).join('')}</tr>`).join('')}</tbody></table></span>`;
@@ -334,7 +381,32 @@ window.LIBRARY = [{"order":10,"category":"관계의 기술 · 갈등과 회복",
     return out.join('');
   }
 
+  const detailSections = [['overview','쓰임과 번역'],['structure','문장 구조'],['grammar','문법'],['words','단어'],['phrases','표현'],['tenses','시제'],['alternatives','말투'],['pitfalls','실수'],['patterns','문형 확장'],['drills','연습']];
+  const sentencePair = ([english, korean]) => `<span class="detail-example"><span lang="en">${esc(english)}</span><span class="detail-example-ko">${esc(korean)}</span></span>`;
+  const detailBlock = (id, title, body, open=true) => `<details class="detail-block" id="detail-${id}" ${open?'open':''}><summary><span>${esc(title)}</span></summary><div class="detail-body">${body}</div></details>`;
+  function richDetailMarkup(example) {
+    const d = example.detail;
+    const cards = items => items.map(item=>`<article class="detail-card">${item.head}${item.body}</article>`).join('');
+    const chips = items => `<ul class="detail-chips">${items.map(item=>`<li>${esc(item)}</li>`).join('')}</ul>`;
+    const wordCards = cards(d.words.map(w=>({head:`<h4><span lang="en">${esc(w.word)}</span><small>${esc(w.pos)}</small></h4>`,body:`<p class="detail-meaning">${esc(w.meaning)}</p><p>${esc(w.nuance)}</p><div class="detail-collocations"><span>함께 쓰는 말</span>${chips(w.collocations)}</div>${sentencePair(w.example)}`})));
+    const phraseCards = d.phrases.length ? cards(d.phrases.map(p=>({head:`<h4><span lang="en">${esc(p.phrase)}</span></h4>`,body:`<p class="detail-meaning">${esc(p.meaning)}</p><p>${esc(p.nuance)}</p>${sentencePair(p.example)}`}))) : '<p class="example-muted">이 문장에는 따로 익힐 고정 표현이 없습니다.</p>';
+    const grammarCards = cards(d.grammarDeep.map(g=>({head:`<h4>${esc(g.point)}</h4>`,body:`<p>${esc(g.explain)}</p><p class="detail-pattern"><span>문형</span><code>${esc(g.pattern)}</code></p>${htmlTable(['예문','해설'],g.examples)}<p class="detail-caution"><span>주의</span>${esc(g.caution)}</p>`})));
+    const drills = d.drills.map((q,i)=>`<li class="detail-drill"><span class="detail-drill-type">${esc(q.type)}</span><p lang="${q.type==='번역'?'ko':'en'}">${esc(q.question)}</p><details><summary>정답과 해설</summary><p class="detail-answer" lang="en">${esc(q.answer)}</p><p>${esc(q.explain)}</p></details></li>`).join('');
+    const nav = `<nav class="detail-nav" aria-label="상세 학습 목차">${detailSections.map(([id,label])=>`<button type="button" data-detail-jump="detail-${id}">${esc(label)}</button>`).join('')}</nav>`;
+    return `<div class="example-detail-heading"><div class="tiny-label">문장 상세 학습</div><h2 lang="en">${esc(example.english)}</h2><p>${esc(example.korean)}</p><p class="detail-reading" lang="en"><span>끊어 읽기</span>${esc(d.reading)}</p>${nav}</div>
+      ${detailBlock('overview','쓰임과 번역',`<p>${esc(d.usage)}</p>${htmlTable(['구분','번역'],[['직역',d.translation.literal],['자연스러운 번역',d.translation.natural]])}<ul class="detail-notes">${d.translation.notes.map(n=>`<li>${esc(n)}</li>`).join('')}</ul><div class="detail-collocations"><span>강세를 두는 말</span></div>${htmlTable(['단어','이유'],d.stress)}`)}
+      ${detailBlock('structure','문장 구조 분석',htmlTable(['구성','역할','설명'],d.breakdown))}
+      ${detailBlock('grammar','문법 상세',grammarCards)}
+      ${detailBlock('words','단어 상세',wordCards)}
+      ${detailBlock('phrases','숙어와 표현',phraseCards)}
+      ${detailBlock('tenses','시제와 상황별 변형',htmlTable(['구분','문장','쓰임'],d.tenses))}
+      ${detailBlock('alternatives','말투 바꿔 쓰기',htmlTable(['말투','문장','뉘앙스'],d.alternatives))}
+      ${detailBlock('pitfalls','자주 하는 실수',htmlTable(['틀린 표현','바른 표현','이유'],d.pitfalls))}
+      ${detailBlock('patterns','문형 확장',htmlTable(['문형','예문','번역'],d.patterns))}
+      ${detailBlock('drills','연습 문제',`<ol class="detail-drills">${drills}</ol>`)}`;
+  }
   function exampleDetailMarkup(example) {
+    if(example.detail)return richDetailMarkup(example);
     const list=(title,items,format)=>`<section class="example-detail-section"><h3>${esc(title)}</h3>${items.length?`<ul>${items.map(item=>`<li>${format(item)}</li>`).join('')}</ul>`:'<p class="example-muted">이 문장에는 따로 익힐 고정 숙어가 없습니다.</p>'}</section>`;
     return `<div class="example-detail-heading"><div class="tiny-label">문장 상세 학습</div><h2>${esc(example.english)}</h2><p>${esc(example.korean)}</p></div>
       ${list('문법',example.grammar,item=>esc(item))}
@@ -435,6 +507,11 @@ window.LIBRARY = [{"order":10,"category":"관계의 기술 · 갈등과 회복",
   document.addEventListener('click',event=>{
     if(!event.target.closest('#header-search'))hideSearch();
     const target=event.target.closest('button,a');if(!target)return;
+    if(target.dataset.detailJump){
+      const block=document.getElementById(target.dataset.detailJump);
+      if(block){block.open=true;const panel=block.closest('.example-detail'),behavior=window.matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth';if(panel&&panel.scrollHeight>panel.clientHeight)panel.scrollTo({top:Math.max(0,block.offsetTop-12),behavior});else block.scrollIntoView({block:'start',behavior});}
+      return;
+    }
     if(target.classList.contains('example-item')){
       const study=target.closest('.example-study');
       const index=Number(target.dataset.exampleIndex);

@@ -189,6 +189,7 @@
   }
   const tableCells = line => line.trim().replace(/^\|/,'').replace(/\|$/,'').split('|').map(cell => cell.trim());
   const tableSeparator = /^\|(\s*:?-{3,}:?\s*\|)+$/;
+  const htmlTable = (head, body, label='') => `<div class="tbl-wrap"${label?` role="group" aria-label="${esc(label)}"`:''}><table><thead><tr>${head.map(cell=>`<th>${esc(cell)}</th>`).join('')}</tr></thead><tbody>${body.map(row=>`<tr>${row.map(cell=>`<td>${esc(cell)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
   function pointTable(rows, indent) {
     const [head, , ...body] = rows;
     return `<span class="tbl-wrap" style="--lv:${indent>>1}"><table><thead><tr>${tableCells(head).map(cell=>`<th>${esc(cell)}</th>`).join('')}</tr></thead><tbody>${body.map(row=>`<tr>${tableCells(row).map(cell=>`<td>${esc(cell)}</td>`).join('')}</tr>`).join('')}</tbody></table></span>`;
@@ -214,7 +215,32 @@
     return out.join('');
   }
 
+  const detailSections = [['overview','쓰임과 번역'],['structure','문장 구조'],['grammar','문법'],['words','단어'],['phrases','표현'],['tenses','시제'],['alternatives','말투'],['pitfalls','실수'],['patterns','문형 확장'],['drills','연습']];
+  const sentencePair = ([english, korean]) => `<span class="detail-example"><span lang="en">${esc(english)}</span><span class="detail-example-ko">${esc(korean)}</span></span>`;
+  const detailBlock = (id, title, body, open=true) => `<details class="detail-block" id="detail-${id}" ${open?'open':''}><summary><span>${esc(title)}</span></summary><div class="detail-body">${body}</div></details>`;
+  function richDetailMarkup(example) {
+    const d = example.detail;
+    const cards = items => items.map(item=>`<article class="detail-card">${item.head}${item.body}</article>`).join('');
+    const chips = items => `<ul class="detail-chips">${items.map(item=>`<li>${esc(item)}</li>`).join('')}</ul>`;
+    const wordCards = cards(d.words.map(w=>({head:`<h4><span lang="en">${esc(w.word)}</span><small>${esc(w.pos)}</small></h4>`,body:`<p class="detail-meaning">${esc(w.meaning)}</p><p>${esc(w.nuance)}</p><div class="detail-collocations"><span>함께 쓰는 말</span>${chips(w.collocations)}</div>${sentencePair(w.example)}`})));
+    const phraseCards = d.phrases.length ? cards(d.phrases.map(p=>({head:`<h4><span lang="en">${esc(p.phrase)}</span></h4>`,body:`<p class="detail-meaning">${esc(p.meaning)}</p><p>${esc(p.nuance)}</p>${sentencePair(p.example)}`}))) : '<p class="example-muted">이 문장에는 따로 익힐 고정 표현이 없습니다.</p>';
+    const grammarCards = cards(d.grammarDeep.map(g=>({head:`<h4>${esc(g.point)}</h4>`,body:`<p>${esc(g.explain)}</p><p class="detail-pattern"><span>문형</span><code>${esc(g.pattern)}</code></p>${htmlTable(['예문','해설'],g.examples)}<p class="detail-caution"><span>주의</span>${esc(g.caution)}</p>`})));
+    const drills = d.drills.map((q,i)=>`<li class="detail-drill"><span class="detail-drill-type">${esc(q.type)}</span><p lang="${q.type==='번역'?'ko':'en'}">${esc(q.question)}</p><details><summary>정답과 해설</summary><p class="detail-answer" lang="en">${esc(q.answer)}</p><p>${esc(q.explain)}</p></details></li>`).join('');
+    const nav = `<nav class="detail-nav" aria-label="상세 학습 목차">${detailSections.map(([id,label])=>`<button type="button" data-detail-jump="detail-${id}">${esc(label)}</button>`).join('')}</nav>`;
+    return `<div class="example-detail-heading"><div class="tiny-label">문장 상세 학습</div><h2 lang="en">${esc(example.english)}</h2><p>${esc(example.korean)}</p><p class="detail-reading" lang="en"><span>끊어 읽기</span>${esc(d.reading)}</p>${nav}</div>
+      ${detailBlock('overview','쓰임과 번역',`<p>${esc(d.usage)}</p>${htmlTable(['구분','번역'],[['직역',d.translation.literal],['자연스러운 번역',d.translation.natural]])}<ul class="detail-notes">${d.translation.notes.map(n=>`<li>${esc(n)}</li>`).join('')}</ul><div class="detail-collocations"><span>강세를 두는 말</span></div>${htmlTable(['단어','이유'],d.stress)}`)}
+      ${detailBlock('structure','문장 구조 분석',htmlTable(['구성','역할','설명'],d.breakdown))}
+      ${detailBlock('grammar','문법 상세',grammarCards)}
+      ${detailBlock('words','단어 상세',wordCards)}
+      ${detailBlock('phrases','숙어와 표현',phraseCards)}
+      ${detailBlock('tenses','시제와 상황별 변형',htmlTable(['구분','문장','쓰임'],d.tenses))}
+      ${detailBlock('alternatives','말투 바꿔 쓰기',htmlTable(['말투','문장','뉘앙스'],d.alternatives))}
+      ${detailBlock('pitfalls','자주 하는 실수',htmlTable(['틀린 표현','바른 표현','이유'],d.pitfalls))}
+      ${detailBlock('patterns','문형 확장',htmlTable(['문형','예문','번역'],d.patterns))}
+      ${detailBlock('drills','연습 문제',`<ol class="detail-drills">${drills}</ol>`)}`;
+  }
   function exampleDetailMarkup(example) {
+    if(example.detail)return richDetailMarkup(example);
     const list=(title,items,format)=>`<section class="example-detail-section"><h3>${esc(title)}</h3>${items.length?`<ul>${items.map(item=>`<li>${format(item)}</li>`).join('')}</ul>`:'<p class="example-muted">이 문장에는 따로 익힐 고정 숙어가 없습니다.</p>'}</section>`;
     return `<div class="example-detail-heading"><div class="tiny-label">문장 상세 학습</div><h2>${esc(example.english)}</h2><p>${esc(example.korean)}</p></div>
       ${list('문법',example.grammar,item=>esc(item))}
@@ -315,6 +341,11 @@
   document.addEventListener('click',event=>{
     if(!event.target.closest('#header-search'))hideSearch();
     const target=event.target.closest('button,a');if(!target)return;
+    if(target.dataset.detailJump){
+      const block=document.getElementById(target.dataset.detailJump);
+      if(block){block.open=true;const panel=block.closest('.example-detail'),behavior=window.matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth';if(panel&&panel.scrollHeight>panel.clientHeight)panel.scrollTo({top:Math.max(0,block.offsetTop-12),behavior});else block.scrollIntoView({block:'start',behavior});}
+      return;
+    }
     if(target.classList.contains('example-item')){
       const study=target.closest('.example-study');
       const index=Number(target.dataset.exampleIndex);
