@@ -44,6 +44,7 @@
 .book-rail{container-type:inline-size}
 @container(max-width:200px){.brand{font-size:16px;gap:8px;padding:0 3px}.brand-mark{width:32px;height:36px;font-size:24px;flex-shrink:0}.brand small{font-size:6px;letter-spacing:.7px}.library-tools{flex-direction:column}.sidebar-caption{font-size:10px;padding-left:4px;padding-right:4px}.sidebar-bottom{font-size:9px}.sidebar-bottom>div{font-size:8px}}
 .shelf-tabs{flex:none;overflow:visible;display:flex;flex-wrap:wrap;gap:2px;margin:18px 0 12px;padding:3px;background:#e9ecdf;border-radius:9px}.shelf-tab{flex:1 1 auto;display:flex;align-items:center;justify-content:center;min-height:34px;padding:6px 4px;border-radius:7px;font-size:10.5px;font-weight:600;letter-spacing:-.1px;color:var(--muted);text-align:center;white-space:nowrap}.shelf-tab:hover{background:#dfe5d3;color:var(--ink)}.shelf-tab.active{background:var(--green);color:#f6f8ed}.document-tabs .nav-label{padding:12px 6px 8px}.document-tabs .nav-label:first-child{padding-top:4px}.shelf-empty{font-size:12px;line-height:1.9;color:var(--muted);padding:40px 8px;text-align:center}@container (max-width:200px){.shelf-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:1050px){.shelf-tabs{margin:14px 0 10px}}
+.document-toc>.toc-group{margin:0}.toc-part{display:flex;align-items:flex-start;gap:6px;cursor:pointer;list-style:none;border-radius:5px;user-select:none}.toc-part::-webkit-details-marker{display:none}.toc-part:hover{background:#eef2e6;color:var(--green)}.toc-chevron{flex:none;width:0;height:0;margin:5px 2px 0 0;border-left:5px solid currentColor;border-top:4px solid transparent;border-bottom:4px solid transparent;transition:transform .15s}.toc-group[open]>.toc-part>.toc-chevron{transform:rotate(90deg)}.toc-items{margin:0 0 4px 12px;padding-left:10px;border-left:1px solid #d6decb}.toc-items>a{display:flex;gap:8px;font-size:12px;line-height:1.8;color:var(--muted);padding:8px 8px;border-radius:5px}.toc-items>a>span{font:11px Georgia,serif;padding-top:4px;opacity:.6;flex-shrink:0}.toc-items>a:hover,.toc-items>a.active{background:#e4ebd9;color:var(--green)}.toc-items>a.active{font-weight:600}@media(max-width:1050px){.toc-items>a{font-size:11px;padding:8px 6px}}@media(prefers-reduced-motion:reduce){.toc-chevron{transition:none}}
 </style>
 
 
@@ -114,6 +115,7 @@ window.LIBRARY = [{"order":10,"category":"관계의 기술 · 갈등과 회복",
   let recent = (Array.isArray(readStored('recent')) ? readStored('recent') : []).filter(id => validIds.has(id));
   let fontSize = [15,16,17,18,19,20].includes(readStored('font')) ? readStored('font') : 16;
   let route = {type:'home'};
+  const foldedParts = new Set((Array.isArray(readStored('toc-folded')) ? readStored('toc-folded') : []).filter(key => typeof key === 'string'));
   let activeShelf = shelves.find(s => s.id === readStored('shelf')) || shelves.find(s => s.id === books[0].shelf);
   let toastTimer;
   let storageWarning = false;
@@ -208,7 +210,7 @@ window.LIBRARY = [{"order":10,"category":"관계의 기술 · 갈등과 회복",
     $('shelf-tabs').innerHTML=shelves.map(s=>`<a class="shelf-tab ${s===activeShelf?'active':''}" href="${shelfHref(s)}" ${s===activeShelf?'aria-current="true"':''}>${esc(s.label)}</a>`).join('');
     const bookTab=b=>`<a class="document-tab ${activeBook?.id===b.id?'active':''}" href="${bookHref(b)}" ${activeBook?.id===b.id?'aria-current="location"':''}><span class="document-number">${String(shelved.indexOf(b)+1).padStart(2,'0')}</span><strong>${esc(b.title)}</strong><span class="depth-arrow" aria-hidden="true">›</span></a>`;
     $('navigation').innerHTML=`<div class="library-tools">${navItem('#home','서재 둘러보기','grid',route.type==='home')}${navItem('#saved','책갈피','bookmark',route.type==='saved',`<span class="count">${saved.size}</span>`)}</div><nav class="document-tabs" data-shelf="${activeShelf.id}" aria-label="${esc(activeShelf.label)} 책별 탐색">${shelved.length?sections.map(section=>`<div class="nav-label">${esc(section)} <span>${shelved.filter(b=>b.section===section).length}</span></div>${shelved.filter(b=>b.section===section).map(bookTab).join('')}`).join(''):`<p class="shelf-empty">${esc(activeShelf.label)} 서가에는<br>아직 책이 없습니다.</p>`}</nav><div class="library-secondary">${navItem('#connections','자료 사이의 연결','link',route.type==='connections')}</div>`;
-    $('topic-panel').innerHTML=activeBook?`<div class="topic-header"><div class="tiny-label">목차</div><h2>${esc(activeBook.title)}</h2><a href="${bookHref(activeBook)}">책 전체 보기 ↗</a></div><nav class="document-toc" data-book="${activeBook.id}" aria-label="${esc(activeBook.title)} 목차">${activeBook.chapters.map((c,i)=>`${i===0||c.part!==activeBook.chapters[i-1].part?`<div class="toc-part">${esc(c.part)}</div>`:''}<a href="${chapterHref(c)}" ${route.chapter?.id===c.id?'class="active" aria-current="page"':''}><span>${String(i+1).padStart(2,'0')}</span>${esc(c.title)}</a>`).join('')}</nav>`:'<p class="topic-empty">왼쪽에서 책을 선택하면<br>이곳에 목차가 나타납니다.</p>';
+    $('topic-panel').innerHTML=activeBook?`<div class="topic-header"><div class="tiny-label">목차</div><h2>${esc(activeBook.title)}</h2><a href="${bookHref(activeBook)}">책 전체 보기 ↗</a></div><nav class="document-toc" data-book="${activeBook.id}" aria-label="${esc(activeBook.title)} 목차">${tocGroups(activeBook)}</nav>`:'<p class="topic-empty">왼쪽에서 책을 선택하면<br>이곳에 목차가 나타납니다.</p>';
     const tabs=document.querySelector('.document-tabs'), toc=document.querySelector('.document-toc');
     requestAnimationFrame(()=>{
       if(!tabs.isConnected)return;
@@ -220,6 +222,24 @@ window.LIBRARY = [{"order":10,"category":"관계의 기술 · 갈등과 회복",
       revealNavigation();
     });
   }
+  function tocGroups(book) {
+    const groups=[];
+    book.chapters.forEach((c,i)=>{
+      const last=groups.at(-1);
+      if(last && last.part===c.part)last.items.push([c,i]);else groups.push({part:c.part,items:[[c,i]]});
+    });
+    return groups.map((group,index)=>{
+      const key=`${book.id}|${index}`;
+      if(route.chapter && group.items.some(([c])=>c===route.chapter))foldedParts.delete(key);
+      return `<details class="toc-group" data-fold="${esc(key)}" ${foldedParts.has(key)?'':'open'}><summary class="toc-part"><span class="toc-chevron" aria-hidden="true"></span>${esc(group.part)}</summary><div class="toc-items">${group.items.map(([c,i])=>`<a href="${chapterHref(c)}" ${route.chapter?.id===c.id?'class="active" aria-current="page"':''}><span>${String(i+1).padStart(2,'0')}</span>${esc(c.title)}</a>`).join('')}</div></details>`;
+    }).join('');
+  }
+  document.addEventListener('toggle',event=>{
+    const group=event.target;
+    if(!(group instanceof HTMLDetailsElement) || !group.classList.contains('toc-group'))return;
+    group.open?foldedParts.delete(group.dataset.fold):foldedParts.add(group.dataset.fold);
+    persist('toc-folded',[...foldedParts]);
+  },true);
   function revealNavigation() {
     for(const container of document.querySelectorAll('.document-tabs,.document-toc')){
       const current=container.querySelector('.active');
