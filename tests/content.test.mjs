@@ -69,11 +69,13 @@ test('reader-facing copy does not mention the source file format or upload contr
   assert.doesNotMatch(ui,/\bPDF\b|type="file"|createObjectURL|data-source/i);
 });
 
-test('every book sits on a known shelf: the original library is Common · 인문, Grammar is English · Grammar',()=>{
+test('every book sits on a known shelf: original books are Common · 인문, English books are classified separately',()=>{
   assert.deepEqual(SHELVES.map(s=>s.label),['English','Electronic','Tech','Common']);
-  for(const book of books.filter(b=>b.id!=='grammar')){assert.equal(book.shelf,'common',book.id);assert.equal(book.section,'인문',book.id);}
+  for(const book of books.filter(b=>!['grammar','situation-english'].includes(b.id))){assert.equal(book.shelf,'common',book.id);assert.equal(book.section,'인문',book.id);}
   const grammar=books.find(b=>b.id==='grammar');
   assert.equal(grammar.shelf,'english');assert.equal(grammar.section,'Grammar');
+  const situation=books.find(b=>b.id==='situation-english');
+  assert.equal(situation.shelf,'english');assert.equal(situation.section,'상황별 학습');
   const fixture=structuredClone(books[0]);
   for(const shelf of [undefined,'','humanities']){fixture.shelf=shelf;assert.throws(()=>validateCatalog([fixture]),/shelf must be one of/);}
   fixture.shelf='english';
