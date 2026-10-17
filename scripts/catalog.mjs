@@ -34,9 +34,10 @@ export function validateCatalog(books) {
     for (const key of ['title','author','description']) require(text(book[key]), `${book.id}: ${key} required`);
     require(SHELVES.some(shelf => shelf.id === book.shelf), `${book.id}: shelf must be one of ${SHELVES.map(shelf => shelf.id).join(', ')}`);
     require(text(book.section), `${book.id}: section required`);
-    require(Number.isInteger(book.pages) && book.pages > 0, `${book.id}: pages must be a positive integer`);
+    require(book.pages === undefined || (Number.isInteger(book.pages) && book.pages > 0), `${book.id}: pages must be a positive integer`);
     require(book.order === undefined || Number.isFinite(book.order), `${book.id}: order must be a number`);
     require(book.category === undefined || text(book.category), `${book.id}: category must be text`);
+    require(book.readerNote === undefined || text(book.readerNote), `${book.id}: readerNote must be non-empty text`);
     require(book.coverImage === undefined || (typeof book.coverImage === 'string' && /^[a-z0-9][a-z0-9-]*\.(png|jpe?g|webp)$/.test(book.coverImage)), `${book.id}: coverImage must be a local PNG, JPEG or WebP filename`);
     require(book.color === undefined || ['blue','rose','sage'].includes(book.color), `${book.id}: color must be blue, rose or sage`);
     require(strings(book.notes), `${book.id}: notes must be a text array`);
@@ -47,7 +48,8 @@ export function validateCatalog(books) {
       for (const key of ['title','part','summary']) require(text(chapter[key]), `${chapter.id}: ${key} required`);
       require(chapter.application === undefined || text(chapter.application), `${chapter.id}: application must be non-empty text`);
       const range = chapter.pages;
-      require(Array.isArray(range) && range.length === 2 && range.every(Number.isInteger) && range[0] >= 1 && range[0] <= range[1] && range[1] <= book.pages, `${chapter.id}: invalid page range`);
+      if (book.pages === undefined) require(range === undefined && chapter.quotes === undefined, `${chapter.id}: chapters of a book without pages cannot carry page ranges or quotes`);
+      else require(Array.isArray(range) && range.length === 2 && range.every(Number.isInteger) && range[0] >= 1 && range[0] <= range[1] && range[1] <= book.pages, `${chapter.id}: invalid page range`);
       if (chapter.quotes !== undefined) {
         require(Array.isArray(chapter.quotes) && chapter.quotes.length <= 2, `${chapter.id}: quotes must be an array of at most two short passages`);
         for (const quote of chapter.quotes) {
@@ -58,7 +60,7 @@ export function validateCatalog(books) {
       require(Array.isArray(chapter.points) && chapter.points.length > 0, `${chapter.id}: points required`);
       for (const point of chapter.points) {
         require(point && text(point.title) && text(point.text), `${chapter.id}: invalid point`);
-        require(point.page === undefined || (Number.isInteger(point.page) && point.page >= 1 && point.page <= book.pages), `${chapter.id}: invalid point page`);
+        require(point.page === undefined || (book.pages !== undefined && Number.isInteger(point.page) && point.page >= 1 && point.page <= book.pages), `${chapter.id}: invalid point page`);
       }
       require(strings(chapter.practice) && strings(chapter.keywords), `${chapter.id}: practice and keywords must be text arrays`);
     }

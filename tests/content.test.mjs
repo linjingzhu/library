@@ -13,7 +13,8 @@ test('all sources have valid navigable chapters and in-range source references',
     for(const c of book.chapters){
       assert.match(c.id,/^[a-z0-9]+(?:-[a-z0-9]+)*$/);assert.ok(!ids.has(c.id),`duplicate ${c.id}`);ids.add(c.id);
       assert.ok(c.title&&c.part&&c.summary);
-      assert.equal(c.pages.length,2);assert.ok(c.pages[0]>=1&&c.pages[0]<=c.pages[1]&&c.pages[1]<=book.pages,`${c.id} page range`);
+      if(book.pages===undefined){assert.equal(c.pages,undefined,`${c.id} page range without book pages`);}
+      else{assert.equal(c.pages.length,2);assert.ok(c.pages[0]>=1&&c.pages[0]<=c.pages[1]&&c.pages[1]<=book.pages,`${c.id} page range`);}
       assert.ok(c.points.length);assert.ok(Array.isArray(c.practice)&&Array.isArray(c.keywords));
       for(const p of c.points){assert.ok(p.title&&p.text);if(p.page)assert.ok(p.page>=1&&p.page<=book.pages,`${c.id} point page`);}
     }
