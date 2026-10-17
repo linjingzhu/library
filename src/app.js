@@ -187,14 +187,36 @@
     if (!chapter.quotes?.length) return '';
     return `<section class="memorable-quotes" aria-label="기억할 문장"><h2>기억할 문장</h2>${chapter.quotes.map(quote=>`<figure class="book-quote"><blockquote><p>${esc(quote.text)}</p></blockquote><figcaption><cite>${esc(book.title)}</cite> · 원문 인용</figcaption></figure>`).join('')}</section>`;
   }
+  const tableCells = line => line.trim().replace(/^\|/,'').replace(/\|$/,'').split('|').map(cell => cell.trim());
+  const tableSeparator = /^\|(\s*:?-{3,}:?\s*\|)+$/;
+  function pointTable(rows, indent) {
+    const [head, , ...body] = rows;
+    return `<span class="tbl-wrap" style="--lv:${indent>>1}"><table><thead><tr>${tableCells(head).map(cell=>`<th>${esc(cell)}</th>`).join('')}</tr></thead><tbody>${body.map(row=>`<tr>${tableCells(row).map(cell=>`<td>${esc(cell)}</td>`).join('')}</tr>`).join('')}</tbody></table></span>`;
+  }
+  function pointBody(text) {
+    return text.includes('\n')?`<div class="point-text">${pointText(text)}</div>`:`<p>${esc(text)}</p>`;
+  }
   function pointText(text) {
-    if(!text.includes('\n'))return esc(text);
-    return text.split('\n').map(line=>{const indent=line.length-line.trimStart().length;return `<span class="ln" style="--lv:${indent>>1}">${esc(line.trimStart())}</span>`;}).join('');
+    const lines = text.split('\n'), out = [];
+    for(let i=0;i<lines.length;){
+      const line = lines[i], indent = line.length-line.trimStart().length;
+      if(line.trimStart().startsWith('|')){
+        const rows = [];
+        while(i<lines.length && lines[i].trimStart().startsWith('|'))rows.push(lines[i++].trim());
+        if(rows.length>=3 && tableSeparator.test(rows[1])){out.push(pointTable(rows, indent));continue;}
+        for(const row of rows)out.push(`<span class="ln" style="--lv:${indent>>1}">${esc(row)}</span>`);
+        continue;
+      }
+      const body = line.trimStart(), bullet = body.startsWith('- ');
+      if(body)out.push(`<span class="ln${bullet?' li':''}" style="--lv:${indent>>1}">${esc(bullet?body.slice(2):body)}</span>`);
+      i++;
+    }
+    return out.join('');
   }
   function readView(book,c) {
     const index=book.chapters.indexOf(c), previous=book.chapters[index-1],next=book.chapters[index+1];
     const isSaved=saved.has(c.id);
-    return `<article class="reading"><div class="reader-topline"><a class="back-link" href="${bookHref(book)}">${icon('back')}책의 전체 구조</a><div class="reader-controls"><button class="icon-button" data-font="-1" aria-label="글자 크기 줄이기" ${fontSize<=15?'disabled':''}>가−</button><button class="icon-button" data-font="1" aria-label="글자 크기 키우기" ${fontSize>=20?'disabled':''}>가+</button><button class="icon-button" data-print aria-label="이 주제 인쇄">${icon('print')}</button><button class="icon-button" data-save="${c.id}" aria-label="${isSaved?'책갈피 해제':'책갈피 저장'}" aria-pressed="${isSaved}">${icon('bookmark')}</button></div></div><div class="eyebrow">${esc(c.part)} · ${String(index+1).padStart(2,'0')} / ${book.chapters.length}</div><h1 class="page-title">${esc(c.title)}</h1><div class="reader-source"><span>${esc(book.title)}</span><span>${c.points.length}개 핵심 항목</span></div><div class="chapter-summary"><small>이 주제에서 얻는 지식</small>${esc(c.summary)}${c.application?`<div class="knowledge-application"><small>판단에 적용하기 · 편집 제안</small><p>${esc(c.application)}</p></div>`:''}</div><section aria-label="핵심 내용">${c.points.map(p=>`<section class="reading-point"><h2>${esc(p.title)}</h2><p>${pointText(p.text)}</p></section>`).join('')}</section>${memorableQuotes(book,c)}${c.practice.length?`<section class="practice"><h2>나의 삶으로 가져오기</h2><small>이 내용을 바탕으로 구성한 실천 질문 · 편집 제안</small><ol>${c.practice.map(p=>`<li>${esc(p)}</li>`).join('')}</ol></section>`:''}<div class="chips">${c.keywords.map(k=>`<button class="chip" data-search="${esc(k)}"># ${esc(k)}</button>`).join('')}</div><div class="prev-next">${previous?`<a href="${chapterHref(previous)}"><small>← 이전 생각</small>${esc(previous.title)}</a>`:'<span></span>'}${next?`<a href="${chapterHref(next)}"><small>다음 생각 →</small>${esc(next.title)}</a>`:`<a href="${bookHref(book)}"><small>책의 구조로 돌아가기 →</small>전체 주제 다시 보기</a>`}</div><p class="note">${esc(book.readerNote || '핵심 내용은 의미를 압축한 해설입니다. 인용문은 원문과 구분해 표시하며, 실천 질문과 판단 기준은 내용을 바탕으로 구성한 편집 제안입니다.')}</p></article>`;
+    return `<article class="reading"><div class="reader-topline"><a class="back-link" href="${bookHref(book)}">${icon('back')}책의 전체 구조</a><div class="reader-controls"><button class="icon-button" data-font="-1" aria-label="글자 크기 줄이기" ${fontSize<=15?'disabled':''}>가−</button><button class="icon-button" data-font="1" aria-label="글자 크기 키우기" ${fontSize>=20?'disabled':''}>가+</button><button class="icon-button" data-print aria-label="이 주제 인쇄">${icon('print')}</button><button class="icon-button" data-save="${c.id}" aria-label="${isSaved?'책갈피 해제':'책갈피 저장'}" aria-pressed="${isSaved}">${icon('bookmark')}</button></div></div><div class="eyebrow">${esc(c.part)} · ${String(index+1).padStart(2,'0')} / ${book.chapters.length}</div><h1 class="page-title">${esc(c.title)}</h1><div class="reader-source"><span>${esc(book.title)}</span><span>${c.points.length}개 핵심 항목</span></div><div class="chapter-summary"><small>이 주제에서 얻는 지식</small>${esc(c.summary)}${c.application?`<div class="knowledge-application"><small>판단에 적용하기 · 편집 제안</small><p>${esc(c.application)}</p></div>`:''}</div><section aria-label="핵심 내용">${c.points.map(p=>`<section class="reading-point"><h2>${esc(p.title)}</h2>${pointBody(p.text)}</section>`).join('')}</section>${memorableQuotes(book,c)}${c.practice.length?`<section class="practice"><h2>나의 삶으로 가져오기</h2><small>이 내용을 바탕으로 구성한 실천 질문 · 편집 제안</small><ol>${c.practice.map(p=>`<li>${esc(p)}</li>`).join('')}</ol></section>`:''}<div class="chips">${c.keywords.map(k=>`<button class="chip" data-search="${esc(k)}"># ${esc(k)}</button>`).join('')}</div><div class="prev-next">${previous?`<a href="${chapterHref(previous)}"><small>← 이전 생각</small>${esc(previous.title)}</a>`:'<span></span>'}${next?`<a href="${chapterHref(next)}"><small>다음 생각 →</small>${esc(next.title)}</a>`:`<a href="${bookHref(book)}"><small>책의 구조로 돌아가기 →</small>전체 주제 다시 보기</a>`}</div><p class="note">${esc(book.readerNote || '핵심 내용은 의미를 압축한 해설입니다. 인용문은 원문과 구분해 표시하며, 실천 질문과 판단 기준은 내용을 바탕으로 구성한 편집 제안입니다.')}</p></article>`;
   }
   const connectionThemes = [
     {title:'이해는 판단을 잠시 멈추는 데서 시작된다',text:'상대의 행동에 붙인 이름을 잠시 내려놓으면, 그 뒤의 욕구와 두려움이 보입니다. 세 책을 함께 읽으면 이해는 정답을 판정하는 일이 아니라 상대의 경험을 구체적으로 알아가는 과정이라는 질문으로 이어집니다.',items:[['꿈','갈등 아래의 바람','표면의 쟁점 아래에 있는 가치와 꿈을 묻습니다.'],['언어','내 방식과 상대의 방식','내가 주는 사랑과 상대가 받는 사랑의 차이를 살핍니다.'],['언어','이름이 전부는 아니다','고정된 개념으로 사람과 세상을 단정하는 습관을 돌아봅니다.']]},
