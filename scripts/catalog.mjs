@@ -21,6 +21,53 @@ export async function loadCatalog(directory) {
   return books.sort((a,b) => (a.order ?? 1000) - (b.order ?? 1000) || a.id.localeCompare(b.id));
 }
 
+const DETAIL_KEYS = ['usage','translation','reading','stress','breakdown','grammarDeep','words','phrases','tenses','alternatives','pitfalls','patterns','drills'];
+const normalizeSentence = value => value.toLowerCase().replace(/[^a-z0-9'’ ]+/g, ' ').replace(/\s+/g, ' ').trim();
+
+// A sentence's study detail: every section is required and its shape is fixed, so all sentences read the same way.
+export function validateExampleDetail(example, where) {
+  const text = value => typeof value === 'string' && value.trim().length > 0;
+  const require = (condition, message) => { if (!condition) throw new Error(`${where}: ${message}`); };
+  const english = value => text(value) && /[A-Za-z]/.test(value);
+  const korean = value => text(value) && /[가-힣]/.test(value);
+  const pair = (value, label) => require(Array.isArray(value) && value.length === 2 && english(value[0]) && korean(value[1]), `${label} must be [English sentence, Korean translation]`);
+  const rows = (value, columns, min, max, label) => {
+    require(Array.isArray(value) && value.length >= min && value.length <= max, `${label} needs ${min}-${max} rows`);
+    for (const row of value) require(Array.isArray(row) && row.length === columns && row.every(text), `${label} rows need ${columns} non-empty cells`);
+  };
+  const detail = example.detail, sentence = normalizeSentence(example.english);
+  require(detail && typeof detail === 'object' && !Array.isArray(detail), 'detail must be an object');
+  for (const key of Object.keys(detail)) require(DETAIL_KEYS.includes(key), `unknown detail section ${key}`);
+  for (const key of DETAIL_KEYS) require(key in detail, `detail.${key} is required`);
+  require(text(detail.usage) && detail.usage.length >= 60, 'detail.usage must explain the situation (60+ characters)');
+  const translation = detail.translation;
+  require(translation && text(translation.literal) && text(translation.natural) && Array.isArray(translation.notes) && translation.notes.length >= 1 && translation.notes.every(text), 'detail.translation needs literal, natural and notes');
+  require(text(detail.reading) && detail.reading.includes(' / ') && normalizeSentence(detail.reading.replace(/\//g, ' ')) === sentence, 'detail.reading must be the sentence with " / " chunk marks');
+  require(Array.isArray(detail.stress) && detail.stress.length >= 2 && detail.stress.every(row => Array.isArray(row) && row.length === 2 && row.every(text) && sentence.split(' ').includes(normalizeSentence(row[0]).split(' ')[0])), 'detail.stress needs 2+ [word of the sentence, reason] rows');
+  rows(detail.breakdown, 3, 3, 12, 'detail.breakdown');
+  require(normalizeSentence(detail.breakdown.map(row => row[0]).join(' ')) === sentence, 'detail.breakdown chunks must reproduce the sentence');
+  require(Array.isArray(detail.grammarDeep) && detail.grammarDeep.length >= 2, 'detail.grammarDeep needs 2+ items');
+  for (const item of detail.grammarDeep) {
+    require(item && text(item.point) && text(item.explain) && item.explain.length >= 80 && text(item.pattern) && text(item.caution) && Array.isArray(item.examples) && item.examples.length >= 2, 'detail.grammarDeep items need point, explain (80+ characters), pattern, 2+ examples and caution');
+    item.examples.forEach(entry => pair(entry, 'detail.grammarDeep example'));
+  }
+  require(Array.isArray(detail.words) && detail.words.length >= 4, 'detail.words needs 4+ items');
+  for (const word of detail.words) {
+    require(word && text(word.word) && text(word.pos) && text(word.meaning) && text(word.nuance) && Array.isArray(word.collocations) && word.collocations.length >= 2 && word.collocations.every(text), 'detail.words items need word, pos, meaning, nuance and 2+ collocations');
+    pair(word.example, 'detail.words example');
+  }
+  require(Array.isArray(detail.phrases) && detail.phrases.length <= 5, 'detail.phrases is a list of at most 5');
+  for (const phrase of detail.phrases) { require(phrase && text(phrase.phrase) && text(phrase.meaning) && text(phrase.nuance), 'detail.phrases items need phrase, meaning and nuance'); pair(phrase.example, 'detail.phrases example'); }
+  rows(detail.tenses, 3, 6, 12, 'detail.tenses');
+  rows(detail.alternatives, 3, 3, 3, 'detail.alternatives');
+  require(JSON.stringify(detail.alternatives.map(row => row[0])) === JSON.stringify(['격식','중립','구어체']), 'detail.alternatives must be 격식, 중립, 구어체');
+  rows(detail.pitfalls, 3, 2, 3, 'detail.pitfalls');
+  rows(detail.patterns, 3, 3, 3, 'detail.patterns');
+  require(Array.isArray(detail.drills) && JSON.stringify(detail.drills.map(item => item && item.type)) === JSON.stringify(['빈칸','변형','번역']), 'detail.drills must be 빈칸, 변형, 번역');
+  for (const drill of detail.drills) require(text(drill.question) && text(drill.answer) && text(drill.explain), 'detail.drills items need question, answer and explain');
+  require(/_{3,}/.test(detail.drills[0].question), 'the 빈칸 drill needs a blank ____');
+}
+
 export function validateCatalog(books) {
   const ids = new Set(), chapterIds = new Set();
   const text = value => typeof value === 'string' && value.trim().length > 0;
@@ -63,6 +110,17 @@ export function validateCatalog(books) {
         require(point.page === undefined || (book.pages !== undefined && Number.isInteger(point.page) && point.page >= 1 && point.page <= book.pages), `${chapter.id}: invalid point page`);
       }
       require(strings(chapter.practice) && strings(chapter.keywords), `${chapter.id}: practice and keywords must be text arrays`);
+      if (chapter.examples !== undefined) {
+        require(Array.isArray(chapter.examples) && chapter.examples.length > 0, `${chapter.id}: examples must be a non-empty list`);
+        for (const example of chapter.examples) {
+          require(example && validId(example.id) && text(example.english) && text(example.korean), `${chapter.id}: every example needs id, english and korean`);
+          if (example.detail !== undefined) validateExampleDetail(example, `${chapter.id}/${example.id}`);
+          else {
+            const where = `${chapter.id}/${example.id}`, pairs = value => Array.isArray(value) && value.every(row => Array.isArray(row) && row.length === 2 && row.every(text));
+            require(strings(example.grammar) && pairs(example.vocabulary) && pairs(example.idioms) && pairs(example.tenseVariants) && example.tenseVariants.length > 0, `${where}: an example without detail needs grammar, vocabulary, idioms and tenseVariants`);
+          }
+        }
+      }
     }
   }
 }

@@ -119,3 +119,37 @@ test('grammar notes use only well-formed, consistent tables',()=>{
     }
   }
 });
+
+test('every situation-based sentence carries a complete study detail, and each broken rule is rejected with its own message',()=>{
+  const situation=books.find(b=>b.id==='situation-english');
+  const examples=situation.chapters.flatMap(c=>c.examples);
+  assert.ok(examples.length>=16);
+  for(const example of examples)assert.ok(example.detail,`${example.id} has no detail`);
+  const fixture=structuredClone(situation);
+  const first=fixture.chapters[0].examples[0];
+  assert.doesNotThrow(()=>validateCatalog([fixture]));
+  const mutations=[
+    ['a section is missing',d=>{delete d.drills},/detail\.drills is required/],
+    ['unknown section',d=>{d.extra=[]},/unknown detail section extra/],
+    ['usage too short',d=>{d.usage='짧음'},/detail\.usage/],
+    ['breakdown no longer reproduces the sentence',d=>{d.breakdown[0][0]='Something else'},/chunks must reproduce the sentence/],
+    ['reading has no chunk marks',d=>{d.reading=first.english},/detail\.reading/],
+    ['stress word is not in the sentence',d=>{d.stress[0][0]='zebra'},/detail\.stress/],
+    ['grammar example is not a bilingual pair',d=>{d.grammarDeep[0].examples[0]=['English only']},/grammarDeep example/],
+    ['word with one collocation',d=>{d.words[0].collocations=['only one']},/detail\.words items/],
+    ['too many phrases',d=>{d.phrases=Array.from({length:6},()=>structuredClone(d.words[0]))},/at most 5/],
+    ['too few tense rows',d=>{d.tenses=d.tenses.slice(0,2)},/detail\.tenses needs/],
+    ['alternatives out of order',d=>{d.alternatives.reverse()},/격식, 중립, 구어체/],
+    ['pitfall row with an empty cell',d=>{d.pitfalls[0][2]=' '},/detail\.pitfalls rows/],
+    ['drill types wrong',d=>{d.drills[0].type='번역'},/빈칸, 변형, 번역/],
+    ['blank drill without a blank',d=>{d.drills[0].question='No blank here'},/needs a blank/],
+  ];
+  for(const [name,mutate,message] of mutations){
+    const broken=structuredClone(fixture);mutate(broken.chapters[0].examples[0].detail);
+    assert.throws(()=>validateCatalog([broken]),message,name);
+  }
+  const legacy=structuredClone(fixture);delete legacy.chapters[0].examples[0].detail;
+  assert.doesNotThrow(()=>validateCatalog([legacy]),'an example without detail keeps the legacy fields and stays valid');
+  delete legacy.chapters[0].examples[0].tenseVariants;
+  assert.throws(()=>validateCatalog([legacy]),/without detail needs/);
+});
