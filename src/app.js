@@ -213,10 +213,24 @@
     }
     return out.join('');
   }
+
+  function exampleDetailMarkup(example) {
+    const list=(title,items,format)=>`<section class="example-detail-section"><h3>${esc(title)}</h3>${items.length?`<ul>${items.map(item=>`<li>${format(item)}</li>`).join('')}</ul>`:'<p class="example-muted">이 문장에는 따로 익힐 고정 숙어가 없습니다.</p>'}</section>`;
+    return `<div class="example-detail-heading"><div class="tiny-label">문장 상세 학습</div><h2>${esc(example.english)}</h2><p>${esc(example.korean)}</p></div>
+      ${list('문법',example.grammar,item=>esc(item))}
+      ${list('단어',example.vocabulary,item=>`<strong>${esc(item[0])}</strong> · ${esc(item[1])}`)}
+      ${list('숙어',example.idioms,item=>`<strong>${esc(item[0])}</strong> · ${esc(item[1])}`)}
+      <section class="example-detail-section"><h3>시제와 상황별 변형</h3><ul>${example.tenseVariants.map(item=>`<li><strong>${esc(item[0])}</strong><br><span class="example-variant">${esc(item[1])}</span></li>`).join('')}</ul></section>`;
+  }
+  function exampleStudy(chapter) {
+    const examples=chapter.examples||[];
+    return `<section class="example-study" aria-label="영어 예문 학습"><div class="example-list"><h2>예문 선택</h2><p class="example-instruction">영문과 한국어 번역을 한 항목씩 비교해 보세요.</p>${examples.map((example,index)=>`<button type="button" class="example-item" data-example-index="${index}" aria-pressed="${index===0}" aria-controls="example-detail"><span class="example-english">${esc(example.english)}</span><span class="example-korean">${esc(example.korean)}</span></button>`).join('')}</div><aside class="example-detail" id="example-detail" aria-live="polite" aria-label="선택한 예문 상세 학습">${examples.length?exampleDetailMarkup(examples[0]):'<p>이 주제에는 예문이 없습니다.</p>'}</aside></section>`;
+  }
+
   function readView(book,c) {
     const index=book.chapters.indexOf(c), previous=book.chapters[index-1],next=book.chapters[index+1];
     const isSaved=saved.has(c.id);
-    return `<article class="reading"><div class="reader-topline"><a class="back-link" href="${bookHref(book)}">${icon('back')}책의 전체 구조</a><div class="reader-controls"><button class="icon-button" data-font="-1" aria-label="글자 크기 줄이기" ${fontSize<=15?'disabled':''}>가−</button><button class="icon-button" data-font="1" aria-label="글자 크기 키우기" ${fontSize>=20?'disabled':''}>가+</button><button class="icon-button" data-print aria-label="이 주제 인쇄">${icon('print')}</button><button class="icon-button" data-save="${c.id}" aria-label="${isSaved?'책갈피 해제':'책갈피 저장'}" aria-pressed="${isSaved}">${icon('bookmark')}</button></div></div><div class="eyebrow">${esc(c.part)} · ${String(index+1).padStart(2,'0')} / ${book.chapters.length}</div><h1 class="page-title">${esc(c.title)}</h1><div class="reader-source"><span>${esc(book.title)}</span><span>${c.points.length}개 핵심 항목</span></div><div class="chapter-summary"><small>이 주제에서 얻는 지식</small>${esc(c.summary)}${c.application?`<div class="knowledge-application"><small>판단에 적용하기 · 편집 제안</small><p>${esc(c.application)}</p></div>`:''}</div><section aria-label="핵심 내용">${c.points.map(p=>`<section class="reading-point"><h2>${esc(p.title)}</h2>${pointBody(p.text)}</section>`).join('')}</section>${memorableQuotes(book,c)}${c.practice.length?`<section class="practice"><h2>나의 삶으로 가져오기</h2><small>이 내용을 바탕으로 구성한 실천 질문 · 편집 제안</small><ol>${c.practice.map(p=>`<li>${esc(p)}</li>`).join('')}</ol></section>`:''}<div class="chips">${c.keywords.map(k=>`<button class="chip" data-search="${esc(k)}"># ${esc(k)}</button>`).join('')}</div><div class="prev-next">${previous?`<a href="${chapterHref(previous)}"><small>← 이전 생각</small>${esc(previous.title)}</a>`:'<span></span>'}${next?`<a href="${chapterHref(next)}"><small>다음 생각 →</small>${esc(next.title)}</a>`:`<a href="${bookHref(book)}"><small>책의 구조로 돌아가기 →</small>전체 주제 다시 보기</a>`}</div><p class="note">${esc(book.readerNote || '핵심 내용은 의미를 압축한 해설입니다. 인용문은 원문과 구분해 표시하며, 실천 질문과 판단 기준은 내용을 바탕으로 구성한 편집 제안입니다.')}</p></article>`;
+    return `<article class="reading"><div class="reader-topline"><a class="back-link" href="${bookHref(book)}">${icon('back')}책의 전체 구조</a><div class="reader-controls"><button class="icon-button" data-font="-1" aria-label="글자 크기 줄이기" ${fontSize<=15?'disabled':''}>가−</button><button class="icon-button" data-font="1" aria-label="글자 크기 키우기" ${fontSize>=20?'disabled':''}>가+</button><button class="icon-button" data-print aria-label="이 주제 인쇄">${icon('print')}</button><button class="icon-button" data-save="${c.id}" aria-label="${isSaved?'책갈피 해제':'책갈피 저장'}" aria-pressed="${isSaved}">${icon('bookmark')}</button></div></div><div class="eyebrow">${esc(c.part)} · ${String(index+1).padStart(2,'0')} / ${book.chapters.length}</div><h1 class="page-title">${esc(c.title)}</h1><div class="reader-source"><span>${esc(book.title)}</span><span>${c.points.length}개 핵심 항목</span></div><div class="chapter-summary"><small>이 주제에서 얻는 지식</small>${esc(c.summary)}${c.application?`<div class="knowledge-application"><small>판단에 적용하기 · 편집 제안</small><p>${esc(c.application)}</p></div>`:''}</div>${c.examples?.length?exampleStudy(c):`<section aria-label="핵심 내용">${c.points.map(p=>`<section class="reading-point"><h2>${esc(p.title)}</h2>${pointBody(p.text)}</section>`).join('')}</section>`}${memorableQuotes(book,c)}${c.practice.length?`<section class="practice"><h2>나의 삶으로 가져오기</h2><small>이 내용을 바탕으로 구성한 실천 질문 · 편집 제안</small><ol>${c.practice.map(p=>`<li>${esc(p)}</li>`).join('')}</ol></section>`:''}<div class="chips">${c.keywords.map(k=>`<button class="chip" data-search="${esc(k)}"># ${esc(k)}</button>`).join('')}</div><div class="prev-next">${previous?`<a href="${chapterHref(previous)}"><small>← 이전 생각</small>${esc(previous.title)}</a>`:'<span></span>'}${next?`<a href="${chapterHref(next)}"><small>다음 생각 →</small>${esc(next.title)}</a>`:`<a href="${bookHref(book)}"><small>책의 구조로 돌아가기 →</small>전체 주제 다시 보기</a>`}</div><p class="note">${esc(book.readerNote || '핵심 내용은 의미를 압축한 해설입니다. 인용문은 원문과 구분해 표시하며, 실천 질문과 판단 기준은 내용을 바탕으로 구성한 편집 제안입니다.')}</p></article>`;
   }
   const connectionThemes = [
     {title:'이해는 판단을 잠시 멈추는 데서 시작된다',text:'상대의 행동에 붙인 이름을 잠시 내려놓으면, 그 뒤의 욕구와 두려움이 보입니다. 세 책을 함께 읽으면 이해는 정답을 판정하는 일이 아니라 상대의 경험을 구체적으로 알아가는 과정이라는 질문으로 이어집니다.',items:[['꿈','갈등 아래의 바람','표면의 쟁점 아래에 있는 가치와 꿈을 묻습니다.'],['언어','내 방식과 상대의 방식','내가 주는 사랑과 상대가 받는 사랑의 차이를 살핍니다.'],['언어','이름이 전부는 아니다','고정된 개념으로 사람과 세상을 단정하는 습관을 돌아봅니다.']]},
@@ -282,7 +296,7 @@
   }
   const normalize=s=>s.toLocaleLowerCase('ko').normalize('NFKC');
   const searchIndex = [
-    ...chapters.map(c=>({title:c.title,source:`${c.book.title}`,href:chapterHref(c),text:[c.title,c.book.title,c.book.author,c.part,c.summary,c.application || '',...(c.quotes || []).map(quote=>quote.text),...c.points.map(p=>p.title+' '+p.text),...c.practice,...c.keywords].join(' ')})),
+    ...chapters.map(c=>({title:c.title,source:`${c.book.title}`,href:chapterHref(c),text:[c.title,c.book.title,c.book.author,c.part,c.summary,c.application || '',...(c.quotes || []).map(quote=>quote.text),...c.points.map(p=>p.title+' '+p.text),...c.practice,...c.keywords,...(c.examples||[]).flatMap(example=>[example.english,example.korean])].join(' ')})),
     ...books.map(b=>({title:b.title,source:'자료 소개 · '+b.author,href:bookHref(b),text:[b.title,b.author,b.subtitle,b.description,b.category].filter(Boolean).join(' ')})),
     ...books.map(b=>({title:`${b.title} · 출처 안내`,source:'자료 출처',href:bookHref(b),text:[b.title,b.author,...b.notes].join(' ')})),
     ...connectionThemes.map(t=>({title:t.title,source:'자료 사이의 연결 · 편집 해석',href:'#connections',text:[t.title,t.text,...t.items.flat()].join(' ')})),
@@ -301,6 +315,17 @@
   document.addEventListener('click',event=>{
     if(!event.target.closest('#header-search'))hideSearch();
     const target=event.target.closest('button,a');if(!target)return;
+    if(target.classList.contains('example-item')){
+      const study=target.closest('.example-study');
+      const index=Number(target.dataset.exampleIndex);
+      const chapter=route.chapter;
+      const example=chapter?.examples?.[index];
+      if(study&&example){
+        study.querySelectorAll('.example-item').forEach((item,i)=>item.setAttribute('aria-pressed',String(i===index)));
+        study.querySelector('.example-detail').innerHTML=exampleDetailMarkup(example);
+      }
+      return;
+    }
     if(target.classList.contains('skip')){event.preventDefault();$('main').focus();return;}
     if(target.hasAttribute('data-close-menu')){toggleMenu(false);return;}
     if(target.dataset.search!==undefined){showSearch(target.dataset.search);return;}
