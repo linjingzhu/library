@@ -119,3 +119,25 @@ test('grammar notes use only well-formed, consistent tables',()=>{
     }
   }
 });
+
+test('every situation-based sentence carries a complete study detail, and incomplete details are rejected',()=>{
+  const situation=books.find(b=>b.id==='situation-english');
+  const examples=situation.chapters.flatMap(c=>c.examples);
+  assert.ok(examples.length>=16);
+  for(const example of examples)assert.ok(example.detail,`${example.id} has no detail`);
+  const fixture=structuredClone(situation);
+  const first=fixture.chapters[0].examples[0];
+  assert.doesNotThrow(()=>validateCatalog([fixture]));
+  const mutations={
+    'a section is missing':d=>{delete d.drills},
+    'breakdown no longer reproduces the sentence':d=>{d.breakdown[0][0]='Something else'},
+    'reading has no chunk marks':d=>{d.reading=first.english},
+    'alternatives out of order':d=>{d.alternatives.reverse()},
+    'drill types wrong':d=>{d.drills[0].type='번역'},
+    'unknown section':d=>{d.extra=[]},
+  };
+  for(const [name,mutate] of Object.entries(mutations)){
+    const broken=structuredClone(fixture);mutate(broken.chapters[0].examples[0].detail);
+    assert.throws(()=>validateCatalog([broken]),/detail/,name);
+  }
+});
