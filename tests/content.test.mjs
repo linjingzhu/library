@@ -13,7 +13,8 @@ test('all sources have valid navigable chapters and in-range source references',
     for(const c of book.chapters){
       assert.match(c.id,/^[a-z0-9]+(?:-[a-z0-9]+)*$/);assert.ok(!ids.has(c.id),`duplicate ${c.id}`);ids.add(c.id);
       assert.ok(c.title&&c.part&&c.summary);
-      assert.equal(c.pages.length,2);assert.ok(c.pages[0]>=1&&c.pages[0]<=c.pages[1]&&c.pages[1]<=book.pages,`${c.id} page range`);
+      if(book.pages===undefined){assert.equal(c.pages,undefined,`${c.id} page range without book pages`);}
+      else{assert.equal(c.pages.length,2);assert.ok(c.pages[0]>=1&&c.pages[0]<=c.pages[1]&&c.pages[1]<=book.pages,`${c.id} page range`);}
       assert.ok(c.points.length);assert.ok(Array.isArray(c.practice)&&Array.isArray(c.keywords));
       for(const p of c.points){assert.ok(p.title&&p.text);if(p.page)assert.ok(p.page>=1&&p.page<=book.pages,`${c.id} point page`);}
     }
@@ -68,11 +69,23 @@ test('reader-facing copy does not mention the source file format or upload contr
   assert.doesNotMatch(ui,/\bPDF\b|type="file"|createObjectURL|data-source/i);
 });
 
-test('every book sits on a known shelf, and the current library is Common · 인문',()=>{
+test('every book sits on a known shelf: the original library is Common · 인문, Grammar is English · Grammar',()=>{
   assert.deepEqual(SHELVES.map(s=>s.label),['English','Electronic','Tech','Common']);
-  for(const book of books){assert.equal(book.shelf,'common',book.id);assert.equal(book.section,'인문',book.id);}
+  for(const book of books.filter(b=>b.id!=='grammar')){assert.equal(book.shelf,'common',book.id);assert.equal(book.section,'인문',book.id);}
+  const grammar=books.find(b=>b.id==='grammar');
+  assert.equal(grammar.shelf,'english');assert.equal(grammar.section,'Grammar');
   const fixture=structuredClone(books[0]);
   for(const shelf of [undefined,'','humanities']){fixture.shelf=shelf;assert.throws(()=>validateCatalog([fixture]),/shelf must be one of/);}
   fixture.shelf='english';
   for(const section of [undefined,'  ']){fixture.section=section;assert.throws(()=>validateCatalog([fixture]),/section required/);}
+});
+
+test('a book without page numbers is valid only when none of its chapters claim page ranges or quotes',()=>{
+  const fixture=structuredClone(books.find(b=>b.id==='grammar'));
+  assert.equal(fixture.pages,undefined);
+  assert.doesNotThrow(()=>validateCatalog([fixture]));
+  fixture.chapters[0].pages=[1,1];
+  assert.throws(()=>validateCatalog([fixture]),/without pages/);
+  delete fixture.chapters[0].pages;fixture.chapters[0].quotes=[{text:'문장',page:1}];
+  assert.throws(()=>validateCatalog([fixture]),/without pages/);
 });
