@@ -22,16 +22,8 @@
       "application": "관찰한 현상, 재현 조건, 추정 원인을 각각 구분해 전달하면 상대가 문제를 빠르게 파악할 수 있습니다.",
       "points": [
         {
-          "title": "관찰한 현상부터 말하기",
-          "text": "무엇이 같은지와 무엇이 다른지를 짧게 나눠 말합니다.\n- The topology is the same, but the shading looks different.\n  토폴로지는 같지만 셰이딩이 다르게 보입니다.\n- The imported mesh doesn't seem to line up quite right.\n  임포트한 메시의 형태가 예상과 조금 맞지 않는 것 같습니다."
-        },
-        {
-          "title": "의견임을 부드럽게 표시하기",
-          "text": "확인된 사실과 개인적인 판단을 구분하는 표현을 씁니다.\n- It looks like the imported mesh may be slightly misaligned.\n  임포트한 메시가 약간 어긋난 것처럼 보입니다.\n- The mesh doesn't seem to match the reference exactly.\n  메시가 기준 파일과 정확히 일치하지 않는 것 같습니다.\n- `doesn't seem to`는 단정적인 `doesn't`보다 조심스러운 관찰을 전달합니다."
-        },
-        {
-          "title": "문제를 파악해 달라고 요청하기",
-          "text": "- Could you take a look at this issue?\n  이 이슈를 한번 살펴봐 주시겠어요?\n- Could you help investigate what might be causing this?\n  원인이 무엇인지 파악하는 데 도움을 주실 수 있을까요?\n- `look into`는 조사해 보다, `take a look`은 한번 살펴보다라는 자연스러운 업무 표현입니다."
+          "title": "학습 방법",
+          "text": "왼쪽에서 예문을 선택하세요. 영어 문장과 번역을 비교한 뒤 오른쪽 설명에서 문법, 단어, 숙어와 시제별 표현을 확인할 수 있습니다."
         }
       ],
       "practice": [
@@ -44,6 +36,120 @@
         "shading",
         "mesh",
         "investigate"
+      ],
+      "examples": [
+        {
+          "id": "topology-shading",
+          "english": "The topology is the same, but the shading looks different.",
+          "korean": "토폴로지는 같지만 셰이딩이 다르게 보입니다.",
+          "grammar": [
+            "두 독립절을 `but`으로 이어 대조합니다.",
+            "`looks`는 감각동사 look의 현재형이며 뒤에 형용사 `different`가 옵니다."
+          ],
+          "vocabulary": [
+            [
+              "topology",
+              "토폴로지, 메시의 연결 구조"
+            ],
+            [
+              "shading",
+              "셰이딩, 표면 음영 처리"
+            ]
+          ],
+          "idioms": [],
+          "tenseVariants": [
+            [
+              "현재",
+              "The topology is the same, but the shading looks different."
+            ],
+            [
+              "과거",
+              "The topology was the same, but the shading looked different."
+            ],
+            [
+              "미래",
+              "The topology will be the same, but the shading may look different."
+            ]
+          ]
+        },
+        {
+          "id": "mesh-fit",
+          "english": "The imported mesh doesn't seem to line up quite right.",
+          "korean": "임포트한 메시가 예상과 정확히 맞지 않는 것 같습니다.",
+          "grammar": [
+            "`doesn't seem to + 동사원형`은 확신을 낮춘 관찰입니다.",
+            "`quite right`는 완전히 정확하거나 적절하지 않다는 뜻입니다."
+          ],
+          "vocabulary": [
+            [
+              "imported",
+              "임포트된"
+            ],
+            [
+              "line up",
+              "정렬되다, 일치하다"
+            ]
+          ],
+          "idioms": [
+            [
+              "line up",
+              "위치나 형태가 맞아떨어지다"
+            ]
+          ],
+          "tenseVariants": [
+            [
+              "현재",
+              "The imported mesh doesn't seem to line up quite right."
+            ],
+            [
+              "과거",
+              "The imported mesh didn't seem to line up quite right."
+            ],
+            [
+              "미래 예상",
+              "The imported mesh may not line up quite right after import."
+            ]
+          ]
+        },
+        {
+          "id": "investigate-cause",
+          "english": "Could you help investigate what might be causing this?",
+          "korean": "무엇이 원인인지 파악하는 데 도움을 주실 수 있을까요?",
+          "grammar": [
+            "`Could you + 동사원형`은 정중한 부탁입니다.",
+            "`what might be causing this`는 investigate의 목적어인 간접의문문이며 어순은 주어+동사입니다."
+          ],
+          "vocabulary": [
+            [
+              "investigate",
+              "조사하다, 원인을 파악하다"
+            ],
+            [
+              "cause",
+              "원인이 되다"
+            ]
+          ],
+          "idioms": [
+            [
+              "cause this",
+              "이 현상을 일으키다"
+            ]
+          ],
+          "tenseVariants": [
+            [
+              "현재 도움 요청",
+              "Could you help investigate what might be causing this?"
+            ],
+            [
+              "과거 확인",
+              "Were you able to investigate what might have caused this?"
+            ],
+            [
+              "추가 조사 요청",
+              "Could you investigate this further?"
+            ]
+          ]
+        }
       ]
     },
     {
@@ -54,16 +160,8 @@
       "application": "확인되지 않은 원인을 사실처럼 표현하지 말고 `might`, `could`, `I wonder if` 같은 완화 표현으로 가설을 제시합니다.",
       "points": [
         {
-          "title": "가능성을 조심스럽게 제시하기",
-          "text": "- I wonder if this could be related to how the vertex normals are updated.\n  버텍스 노멀 갱신 방식과 관련이 있을 수도 있을 것 같습니다.\n- Could this be related to the way vertex normals are recalculated?\n  버텍스 노멀을 다시 계산하는 방식과 관련이 있을까요?\n- `I wonder if`는 단정하지 않고 가능성을 제기할 때 유용합니다."
-        },
-        {
-          "title": "잘 모른다는 점을 솔직하게 밝히기",
-          "text": "- I'm not sure what's happening on the render engine side, so I'm only guessing that it may be a normal-related issue.\n  렌더 엔진 쪽에서 어떤 일이 있는지 확실히 몰라서, 노멀 관련 문제일 수 있다고 추측하는 정도입니다.\n- I don't know enough about the render engine issue to say for sure, so this is just a guess.\n  렌더 엔진 이슈에 대해 확실히 말할 만큼 알지는 못해, 이건 어디까지나 추측입니다.\n- `only guessing`과 `just a guess`는 가설의 확신 수준을 낮춰 줍니다."
-        },
-        {
-          "title": "관찰과 가설을 한 문단으로 연결하기",
-          "text": "- I tested the file you shared. The topology is the same, but the shadows look different. I wonder if this could be related to how the vertex normals are updated.\n  공유해 주신 파일을 테스트했습니다. 토폴로지는 같지만 그림자가 다르게 보입니다. 버텍스 노멀 갱신 방식과 관련이 있을 수도 있을 것 같습니다."
+          "title": "학습 방법",
+          "text": "왼쪽에서 예문을 선택하세요. 영어 문장과 번역을 비교한 뒤 오른쪽 설명에서 문법, 단어, 숙어와 시제별 표현을 확인할 수 있습니다."
         }
       ],
       "practice": [
@@ -77,6 +175,90 @@
         "could",
         "I wonder if",
         "vertex normals"
+      ],
+      "examples": [
+        {
+          "id": "vertex-normal-hypothesis",
+          "english": "I wonder if this could be related to how the vertex normals are updated.",
+          "korean": "버텍스 노멀 갱신 방식과 관련이 있을 수도 있을 것 같습니다.",
+          "grammar": [
+            "`I wonder if`는 가능성을 조심스럽게 제기합니다.",
+            "`how the vertex normals are updated`는 수동태가 쓰인 명사절입니다."
+          ],
+          "vocabulary": [
+            [
+              "vertex normal",
+              "버텍스 노멀"
+            ],
+            [
+              "update",
+              "갱신하다"
+            ]
+          ],
+          "idioms": [
+            [
+              "be related to",
+              "~와 관련이 있다"
+            ]
+          ],
+          "tenseVariants": [
+            [
+              "현재 가설",
+              "I wonder if this could be related to how the vertex normals are updated."
+            ],
+            [
+              "과거 가설",
+              "I wondered if this could be related to how the vertex normals were updated."
+            ],
+            [
+              "미래 우려",
+              "I wonder if this could affect how the vertex normals will be updated."
+            ]
+          ]
+        },
+        {
+          "id": "render-engine-guess",
+          "english": "I'm not sure what's happening on the render engine side, so I'm only guessing that it may be a normal-related issue.",
+          "korean": "렌더 엔진 쪽에서 어떤 일이 있는지 확실히 몰라서, 노멀 관련 문제일 수 있다고 추측하는 정도입니다.",
+          "grammar": [
+            "`I'm not sure` 뒤의 `what's happening`은 간접의문문입니다.",
+            "`so`가 정보 부족과 조심스러운 추측의 이유를 연결합니다."
+          ],
+          "vocabulary": [
+            [
+              "render engine",
+              "렌더 엔진"
+            ],
+            [
+              "normal-related",
+              "노멀과 관련된"
+            ]
+          ],
+          "idioms": [
+            [
+              "on ... side",
+              "~쪽에서, ~측면에서"
+            ],
+            [
+              "only guessing",
+              "그저 추측하는 중"
+            ]
+          ],
+          "tenseVariants": [
+            [
+              "현재 추측",
+              "I'm only guessing that it may be a normal-related issue."
+            ],
+            [
+              "과거 추측",
+              "I was only guessing that it might have been a normal-related issue."
+            ],
+            [
+              "추가 확인 계획",
+              "I'll check with the render engine team before drawing a conclusion."
+            ]
+          ]
+        }
       ]
     },
     {
@@ -87,16 +269,8 @@
       "application": "첨부 사실만 알리는 데 그치지 말고 파일을 통해 확인한 내용이나 필요한 다음 행동을 함께 적습니다.",
       "points": [
         {
-          "title": "공유받은 자료로 테스트했다고 알리기",
-          "text": "- I tested the file Yazan shared with me.\n  Yazan 씨가 공유해 주신 파일로 테스트해 보았습니다.\n- I tried reproducing the issue using the file you sent.\n  보내 주신 파일로 문제를 재현해 보았습니다.\n- `using the file`을 붙이면 어떤 자료를 기준으로 테스트했는지 분명해집니다."
-        },
-        {
-          "title": "파일을 보낼 때 목적 밝히기",
-          "text": "- I'll attach the file so you can take a closer look.\n  더 자세히 확인하실 수 있도록 파일을 첨부하겠습니다.\n- I've attached a file that reproduces the issue.\n  문제를 재현하는 파일을 첨부했습니다.\n- I'll share the file separately for investigation.\n  조사를 위해 파일을 별도로 공유하겠습니다."
-        },
-        {
-          "title": "테스트 결과와 요청을 이어 쓰기",
-          "text": "- I tested the file and noticed that the imported mesh doesn't quite match. I've attached it so you can investigate further.\n  파일을 테스트해 보니 임포트된 메시가 완전히 맞지 않는 점을 확인했습니다. 추가로 살펴보실 수 있도록 첨부했습니다."
+          "title": "학습 방법",
+          "text": "왼쪽에서 예문을 선택하세요. 영어 문장과 번역을 비교한 뒤 오른쪽 설명에서 문법, 단어, 숙어와 시제별 표현을 확인할 수 있습니다."
         }
       ],
       "practice": [
@@ -110,6 +284,47 @@
         "재현",
         "attach",
         "reproduce"
+      ],
+      "examples": [
+        {
+          "id": "attach-file",
+          "english": "I'll attach the file so you can take a closer look.",
+          "korean": "더 자세히 확인하실 수 있도록 파일을 첨부하겠습니다.",
+          "grammar": [
+            "`I'll attach`는 지금 결정한 가까운 미래의 행동입니다.",
+            "`so + 주어 + can`은 목적 또는 기대하는 결과를 나타냅니다."
+          ],
+          "vocabulary": [
+            [
+              "attach",
+              "첨부하다"
+            ],
+            [
+              "closer look",
+              "더 자세한 확인"
+            ]
+          ],
+          "idioms": [
+            [
+              "take a look",
+              "살펴보다"
+            ]
+          ],
+          "tenseVariants": [
+            [
+              "현재 완료",
+              "I've attached the file so you can take a closer look."
+            ],
+            [
+              "과거",
+              "I attached the file so you could take a closer look."
+            ],
+            [
+              "미래",
+              "I'll attach the file so you can take a closer look."
+            ]
+          ]
+        }
       ]
     },
     {
@@ -120,16 +335,8 @@
       "application": "제안의 배경을 먼저 설명하고, 변경 범위와 기대 효과를 구체적으로 제시합니다.",
       "points": [
         {
-          "title": "현재 상태와 불편을 설명하기",
-          "text": "- CLO defaults to Screen coordinates, while MD defaults to Local.\n  CLO는 Screen 좌표를, MD는 Local 좌표를 기본값으로 사용합니다.\n- Users have reported that the current behavior can be inconvenient.\n  현재 동작이 불편하다는 사용자 의견이 있었습니다.\n- `while`은 두 제품의 차이를 간결하게 비교할 때 쓸 수 있습니다."
-        },
-        {
-          "title": "제안을 정중하게 꺼내기",
-          "text": "- I'd like to suggest changing the default coordinate mode to World for both CLO and MD.\n  CLO와 MD 모두 기본 좌표 모드를 World로 변경하는 방안을 제안하고 싶습니다.\n- Would it make sense to set World as the default in both products?\n  두 제품 모두 World를 기본값으로 설정하는 것이 어떨까요?\n- `I'd like to suggest`는 정중하고 명확한 제안입니다. `Would it make sense to...?`는 함께 검토하자는 느낌을 줍니다."
-        },
-        {
-          "title": "이전 논의가 있었다는 점을 언급하기",
-          "text": "- I understand this has been discussed several times, but no decision has been made yet.\n  이 주제가 여러 차례 논의됐지만 아직 결정되지 않은 것으로 알고 있습니다.\n- I believe this came up before, though I don't think a decision was made.\n  전에 이 이야기가 나온 것으로 기억하지만 결정되지는 않은 것 같습니다.\n- 확실하지 않은 과거 이력은 `I understand`나 `I believe`로 표현하면 단정하는 인상을 줄일 수 있습니다."
+          "title": "학습 방법",
+          "text": "왼쪽에서 예문을 선택하세요. 영어 문장과 번역을 비교한 뒤 오른쪽 설명에서 문법, 단어, 숙어와 시제별 표현을 확인할 수 있습니다."
         }
       ],
       "practice": [
@@ -142,6 +349,86 @@
         "coordinate mode",
         "World",
         "사용자 의견"
+      ],
+      "examples": [
+        {
+          "id": "world-default-proposal",
+          "english": "I'd like to suggest changing the default coordinate mode to World for both CLO and MD.",
+          "korean": "CLO와 MD 모두 기본 좌표 모드를 World로 변경하는 방안을 제안하고 싶습니다.",
+          "grammar": [
+            "`I'd like to`는 `I want to`보다 정중하게 의사를 표현합니다.",
+            "`suggest + 동명사` 구조이므로 `changing`을 씁니다."
+          ],
+          "vocabulary": [
+            [
+              "default",
+              "기본값"
+            ],
+            [
+              "coordinate mode",
+              "좌표 모드"
+            ]
+          ],
+          "idioms": [
+            [
+              "I'd like to suggest",
+              "~을 제안하고 싶습니다"
+            ]
+          ],
+          "tenseVariants": [
+            [
+              "현재 제안",
+              "I'd like to suggest changing the default coordinate mode to World."
+            ],
+            [
+              "과거 제안",
+              "I suggested changing the default coordinate mode to World."
+            ],
+            [
+              "미래 제안",
+              "I'll suggest changing the default coordinate mode to World."
+            ]
+          ]
+        },
+        {
+          "id": "prior-discussion",
+          "english": "I understand this has been discussed several times, but no decision has been made yet.",
+          "korean": "이 주제가 여러 차례 논의됐지만 아직 결정되지 않은 것으로 알고 있습니다.",
+          "grammar": [
+            "`has been discussed`와 `has been made`는 현재완료 수동태입니다.",
+            "`yet`은 부정문에서 아직까지 결과가 없음을 나타냅니다."
+          ],
+          "vocabulary": [
+            [
+              "several times",
+              "여러 차례"
+            ],
+            [
+              "decision",
+              "결정"
+            ]
+          ],
+          "idioms": [
+            [
+              "I understand",
+              "제가 알기로는, 이해하기로는"
+            ]
+          ],
+          "tenseVariants": [
+            [
+              "현재까지",
+              "This has been discussed several times, but no decision has been made yet."
+            ],
+            [
+              "과거 시점",
+              "This was discussed several times, but no decision was made."
+            ],
+            [
+              "미래 계획",
+              "This will be discussed again before a decision is made."
+            ]
+          ]
+        }
       ]
     },
     {
@@ -152,16 +439,8 @@
       "application": "변경이 간단한지와 일정이 적절한지는 별개의 질문입니다. 작업 범위와 우선순위를 구분해 설명하세요.",
       "points": [
         {
-          "title": "범위에 따라 일정 제안하기",
-          "text": "- Changing the default setting alone would be straightforward, but improving the gizmo itself involves several considerations.\n  기본 설정만 바꾸는 일은 간단하지만 기즈모 자체를 개선하려면 여러 가지를 고려해야 합니다.\n- 2026.2 feels too soon for a broader gizmo improvement, so I think 2027.0 would be a better target.\n  기즈모 전반을 개선하기에는 2026.2가 너무 촉박해 보여서 2027.0이 더 적절한 목표라고 생각합니다.\n- `alone`은 변경 범위를 기본 설정으로 한정하고, `broader`는 더 넓은 개선을 가리킵니다."
-        },
-        {
-          "title": "제안에 동의한다고 말하기",
-          "text": "- I agree that it would be good to address the proposed changes together.\n  제안된 변경 사항을 함께 다루는 것이 좋다는 데 동의합니다.\n- I agree with addressing these items together.\n  이 항목들을 함께 다루는 데 동의합니다.\n- `I agree that + 문장`은 의견 전체에 동의할 때, `I agree with + 명사/동명사`는 대상에 동의할 때 씁니다."
-        },
-        {
-          "title": "시간 압박을 고려하기",
-          "text": "- If you're under time pressure, we could focus on the default setting first and plan the broader improvements for a later release.\n  일정이 촉박하다면 기본 설정을 먼저 다루고 더 폭넓은 개선은 이후 버전으로 계획할 수 있습니다.\n- If the timeline is tight, we can split this into smaller steps.\n  일정이 빠듯하다면 작업을 더 작은 단계로 나눌 수 있습니다.\n- `If you're under time pressure,`는 뒤에 제안이나 대안이 이어지는 문장 첫머리 표현입니다."
+          "title": "학습 방법",
+          "text": "왼쪽에서 예문을 선택하세요. 영어 문장과 번역을 비교한 뒤 오른쪽 설명에서 문법, 단어, 숙어와 시제별 표현을 확인할 수 있습니다."
         }
       ],
       "practice": [
@@ -174,6 +453,176 @@
         "우선순위",
         "release",
         "time pressure"
+      ],
+      "examples": [
+        {
+          "id": "release-plan",
+          "english": "I'm thinking we could develop an improvement plan based on the suggestion and implement it in 2027.0.",
+          "korean": "제안에 따라 개선안을 마련해 2027.0에 도입하는 방안을 생각하고 있습니다.",
+          "grammar": [
+            "`I'm thinking we could`는 확정이 아닌 검토 중인 제안을 완곡하게 전합니다.",
+            "`based on the suggestion`은 근거를 나타내는 과거분사구입니다."
+          ],
+          "vocabulary": [
+            [
+              "improvement plan",
+              "개선안"
+            ],
+            [
+              "implement",
+              "도입하다, 구현하다"
+            ]
+          ],
+          "idioms": [
+            [
+              "based on",
+              "~을 바탕으로"
+            ]
+          ],
+          "tenseVariants": [
+            [
+              "현재 검토",
+              "I'm thinking we could develop an improvement plan."
+            ],
+            [
+              "과거 검토",
+              "I was thinking we could develop an improvement plan."
+            ],
+            [
+              "확정된 미래 계획",
+              "We'll develop an improvement plan and implement it in 2027.0."
+            ]
+          ]
+        },
+        {
+          "id": "scope-timeline",
+          "english": "Changing the default setting alone would be straightforward, but improving the gizmo itself involves several considerations, so targeting 2026.2 feels a bit rushed.",
+          "korean": "기본 설정만 바꾸는 것은 간단하지만 기즈모 자체를 개선하려면 고려할 점이 여러 가지라 2026.2는 조금 촉박해 보입니다.",
+          "grammar": [
+            "문장 앞의 `Changing ...`은 동명사구로 주어 역할을 합니다.",
+            "`would be`는 조건을 완곡하게 표현하고, `feels`는 일정이 촉박하다는 판단을 나타냅니다."
+          ],
+          "vocabulary": [
+            [
+              "straightforward",
+              "간단한, straightforward한"
+            ],
+            [
+              "consideration",
+              "고려 사항"
+            ],
+            [
+              "target",
+              "목표로 삼다"
+            ]
+          ],
+          "idioms": [
+            [
+              "a bit rushed",
+              "조금 촉박한"
+            ]
+          ],
+          "tenseVariants": [
+            [
+              "현재 판단",
+              "Targeting 2026.2 feels a bit rushed."
+            ],
+            [
+              "과거 판단",
+              "Targeting 2026.2 felt a bit rushed."
+            ],
+            [
+              "미래 판단",
+              "Targeting 2026.2 may feel a bit rushed."
+            ]
+          ]
+        },
+        {
+          "id": "agree-together",
+          "english": "I agree that it would be good to address the proposed changes together.",
+          "korean": "제안된 변경 사항을 함께 다루는 것이 좋다는 데 동의합니다.",
+          "grammar": [
+            "`I agree that + 절`은 의견 전체에 동의할 때 씁니다.",
+            "`would be good to`는 제안을 부드럽게 표현합니다."
+          ],
+          "vocabulary": [
+            [
+              "proposed",
+              "제안된"
+            ],
+            [
+              "address",
+              "다루다, 대응하다"
+            ]
+          ],
+          "idioms": [
+            [
+              "address an issue",
+              "문제나 안건을 다루다"
+            ]
+          ],
+          "tenseVariants": [
+            [
+              "현재 동의",
+              "I agree that it would be good to address these changes together."
+            ],
+            [
+              "과거 동의",
+              "I agreed that it would be good to address these changes together."
+            ],
+            [
+              "미래 동의",
+              "I think it will be good to address these changes together."
+            ]
+          ]
+        },
+        {
+          "id": "time-pressure",
+          "english": "If you're under time pressure, we could focus on the default setting first and plan the broader improvements for a later release.",
+          "korean": "일정이 촉박하다면 기본 설정을 먼저 다루고 더 폭넓은 개선은 다음 릴리스로 계획할 수 있습니다.",
+          "grammar": [
+            "`If + 현재형, 주어 + could`는 가능한 대안을 제안합니다.",
+            "`focus on`과 `plan`은 `could` 뒤에서 동사원형으로 병렬 연결됩니다."
+          ],
+          "vocabulary": [
+            [
+              "time pressure",
+              "시간 압박"
+            ],
+            [
+              "broader",
+              "더 폭넓은"
+            ],
+            [
+              "release",
+              "제품 버전, 릴리스"
+            ]
+          ],
+          "idioms": [
+            [
+              "under time pressure",
+              "시간에 쫓기는, 일정이 촉박한"
+            ],
+            [
+              "focus on",
+              "~에 집중하다"
+            ]
+          ],
+          "tenseVariants": [
+            [
+              "현재 조건",
+              "If you're under time pressure, we could split the work."
+            ],
+            [
+              "과거 조건",
+              "If you were under time pressure, we could have focused on the default setting first."
+            ],
+            [
+              "미래 일정",
+              "If the timeline gets tight, we can move the broader changes to a later release."
+            ]
+          ]
+        }
       ]
     },
     {
@@ -184,16 +633,8 @@
       "application": "상대의 선택권을 존중하면서 실행 가능한 다음 행동을 제안하면 업무 요청이 더 명확해집니다.",
       "points": [
         {
-          "title": "담당자가 불분명한 상황 설명하기",
-          "text": "- If it's unclear who should take this on, I can handle the implementation.\n  누가 맡아야 할지 불분명하다면 제가 구현을 맡을 수 있습니다.\n- If no one has been assigned yet, I'm happy to take this on.\n  아직 담당자가 정해지지 않았다면 제가 맡겠습니다.\n- `take this on`은 업무나 책임을 맡는다는 자연스러운 표현입니다."
-        },
-        {
-          "title": "다음 행동을 정중하게 부탁하기",
-          "text": "- Could you create a development ticket for this?\n  이 건에 대한 개발 티켓을 만들어 주실 수 있을까요?\n- Could you please create a ticket so we can track this work?\n  이 작업을 추적할 수 있도록 티켓을 만들어 주시겠어요?\n- `Could you...?`만으로도 정중합니다. `please`를 더하면 공손함을 강조하지만, 매 문장에 넣을 필요는 없습니다."
-        },
-        {
-          "title": "진행 여부를 묻기",
-          "text": "- Please let me know how you'd like to proceed.\n  어떻게 진행하면 좋을지 알려 주세요.\n- Let me know if you'd like me to take care of this.\n  제가 이 일을 맡으면 좋을지 알려 주세요.\n- 첫 문장은 상대가 방향을 정하도록 열어 둡니다. 두 번째는 내가 맡을 수 있다는 점을 다시 환기합니다."
+          "title": "학습 방법",
+          "text": "왼쪽에서 예문을 선택하세요. 영어 문장과 번역을 비교한 뒤 오른쪽 설명에서 문법, 단어, 숙어와 시제별 표현을 확인할 수 있습니다."
         }
       ],
       "practice": [
@@ -206,6 +647,81 @@
         "take this on",
         "Could you",
         "follow-up"
+      ],
+      "examples": [
+        {
+          "id": "create-ticket",
+          "english": "Could you please create a development ticket for this?",
+          "korean": "이 건에 대한 개발 티켓을 만들어 주시겠어요?",
+          "grammar": [
+            "`Could you please + 동사원형`은 정중한 요청입니다.",
+            "`for this`는 티켓이 다룰 대상을 가리킵니다."
+          ],
+          "vocabulary": [
+            [
+              "development ticket",
+              "개발 티켓"
+            ],
+            [
+              "create",
+              "만들다, 생성하다"
+            ]
+          ],
+          "idioms": [],
+          "tenseVariants": [
+            [
+              "현재 요청",
+              "Could you please create a development ticket for this?"
+            ],
+            [
+              "과거에 요청했는지 확인",
+              "Did you create a development ticket for this?"
+            ],
+            [
+              "미래 계획 제안",
+              "Could you create a development ticket for the next release?"
+            ]
+          ]
+        },
+        {
+          "id": "take-ownership",
+          "english": "If it's unclear who should be assigned, I can take care of the implementation.",
+          "korean": "담당자가 누구인지 불분명하다면 제가 구현을 맡을 수 있습니다.",
+          "grammar": [
+            "`who should be assigned`는 간접의문문 형태의 명사절입니다.",
+            "`I can`은 능력과 자발적인 의사를 함께 나타냅니다."
+          ],
+          "vocabulary": [
+            [
+              "assigned",
+              "담당자로 지정된"
+            ],
+            [
+              "implementation",
+              "구현"
+            ]
+          ],
+          "idioms": [
+            [
+              "take care of",
+              "맡아서 처리하다"
+            ]
+          ],
+          "tenseVariants": [
+            [
+              "현재 제안",
+              "I can take care of the implementation."
+            ],
+            [
+              "과거에 맡았음",
+              "I took care of the implementation."
+            ],
+            [
+              "미래에 맡을 수 있음",
+              "I can take care of the implementation in the next release."
+            ]
+          ]
+        }
       ]
     },
     {
@@ -216,16 +732,8 @@
       "application": "영향을 받는 항목과 결과를 먼저 밝히고, 마지막에 진행 여부를 묻습니다.",
       "points": [
         {
-          "title": "변경으로 발생하는 결과 알리기",
-          "text": "- Changing the type will remove the keyframes for Puller Position (Bottom).\n  타입을 변경하면 Puller Position (Bottom)의 키프레임이 제거됩니다.\n- If you change the type, the keyframes for Puller Position (Bottom) will be removed.\n  타입을 변경하는 경우 Puller Position (Bottom)의 키프레임이 제거됩니다.\n- 첫 문장은 `Changing ...`을 주어로 써서 경고를 간결하게 전달합니다. 제품 UI에서는 보통 더 짧은 문장이 읽기 쉽습니다."
-        },
-        {
-          "title": "진행해도 되는지 확인하기",
-          "text": "- Do you want to continue?\n  계속 진행하시겠습니까?\n- Would you like to proceed?\n  진행하시겠습니까?\n- `continue`는 현재 하던 작업을 계속하는 데, `proceed`는 확인 단계를 거쳐 다음 단계로 진행하는 데 자주 씁니다."
-        },
-        {
-          "title": "경고와 확인을 한 문구로 만들기",
-          "text": "- Changing the type will remove the keyframes for Puller Position (Bottom). Do you want to continue?\n  타입을 변경하면 Puller Position (Bottom)의 키프레임이 제거됩니다. 그래도 진행하시겠습니까?"
+          "title": "학습 방법",
+          "text": "왼쪽에서 예문을 선택하세요. 영어 문장과 번역을 비교한 뒤 오른쪽 설명에서 문법, 단어, 숙어와 시제별 표현을 확인할 수 있습니다."
         }
       ],
       "practice": [
@@ -238,6 +746,42 @@
         "keyframes",
         "continue",
         "proceed"
+      ],
+      "examples": [
+        {
+          "id": "keyframe-warning",
+          "english": "Changing the type will remove the keyframes for Puller Position (Bottom). Do you want to continue?",
+          "korean": "타입을 변경하면 Puller Position (Bottom)의 키프레임이 제거됩니다. 그래도 진행하시겠습니까?",
+          "grammar": [
+            "첫 문장의 `Changing the type`은 동명사구 주어입니다.",
+            "`will remove`는 변경 뒤 발생할 결과를, `Do you want to...?`는 현재의 의사를 묻습니다."
+          ],
+          "vocabulary": [
+            [
+              "keyframe",
+              "키프레임"
+            ],
+            [
+              "remove",
+              "제거하다"
+            ]
+          ],
+          "idioms": [],
+          "tenseVariants": [
+            [
+              "현재 확인",
+              "Do you want to continue?"
+            ],
+            [
+              "과거에 의사를 확인",
+              "Did you want to continue?"
+            ],
+            [
+              "공손한 진행 확인",
+              "Would you like to proceed?"
+            ]
+          ]
+        }
       ]
     },
     {
@@ -248,16 +792,8 @@
       "application": "브랜드명, 제품 문구, 일반 문장에서는 자연스러움의 기준이 다르므로 사용 목적을 함께 밝혀 비교합니다.",
       "points": [
         {
-          "title": "단어의 의미 확인하기",
-          "text": "- What does “trivia” mean?\n  “trivia”는 무슨 뜻인가요?\n- How is “trivia” different from “general knowledge”?\n  “trivia”는 “general knowledge”와 어떻게 다른가요?\n- `What does ... mean?`은 뜻을 묻고, `How is ... different from ...?`는 뉘앙스 차이를 묻습니다."
-        },
-        {
-          "title": "이름 후보를 비교해 달라고 하기",
-          "text": "- What would be a natural name combining “trivia” and “-pedia”?\n  “trivia”와 “-pedia”를 결합하면 어떤 이름이 자연스러울까요?\n- Which option sounds more natural as a website name?\n  웹사이트 이름으로는 어떤 선택지가 더 자연스럽게 들리나요?\n- `sound natural`은 실제 표현이나 이름이 자연스럽게 느껴지는지를 묻는 말입니다."
-        },
-        {
-          "title": "사소한 지식과 폭넓은 지식의 차이",
-          "text": "- “Trivia” often refers to small but interesting facts or bits of general knowledge.\n  “Trivia”는 흥미롭지만 사소한 사실이나 잡다한 지식을 가리키는 경우가 많습니다.\n- “General knowledge” sounds broader and more neutral.\n  “General knowledge”는 더 폭넓고 중립적인 느낌을 줍니다.\n- 이름으로 쓸 때는 뜻뿐 아니라 대상 독자와 원하는 인상도 함께 고려합니다."
+          "title": "학습 방법",
+          "text": "왼쪽에서 예문을 선택하세요. 영어 문장과 번역을 비교한 뒤 오른쪽 설명에서 문법, 단어, 숙어와 시제별 표현을 확인할 수 있습니다."
         }
       ],
       "practice": [
@@ -270,6 +806,38 @@
         "trivia",
         "general knowledge",
         "이름"
+      ],
+      "examples": [
+        {
+          "id": "trivia-meaning",
+          "english": "What does “trivia” mean?",
+          "korean": "“trivia”는 무슨 뜻인가요?",
+          "grammar": [
+            "`What does + 주어 + 동사원형`은 현재의 뜻이나 기능을 묻는 의문문입니다.",
+            "조동사 `does`가 있으므로 본동사는 `means`가 아니라 `mean`입니다."
+          ],
+          "vocabulary": [
+            [
+              "trivia",
+              "잡학, 사소하지만 흥미로운 사실"
+            ]
+          ],
+          "idioms": [],
+          "tenseVariants": [
+            [
+              "현재 의미",
+              "What does “trivia” mean?"
+            ],
+            [
+              "과거에 쓰인 뜻",
+              "What did “trivia” mean in this context?"
+            ],
+            [
+              "앞으로의 용례",
+              "What will “trivia” mean in this product name?"
+            ]
+          ]
+        }
       ]
     }
   ]
