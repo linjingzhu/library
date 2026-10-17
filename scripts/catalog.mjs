@@ -115,6 +115,10 @@ export function validateCatalog(books) {
         for (const example of chapter.examples) {
           require(example && validId(example.id) && text(example.english) && text(example.korean), `${chapter.id}: every example needs id, english and korean`);
           if (example.detail !== undefined) validateExampleDetail(example, `${chapter.id}/${example.id}`);
+          else {
+            const where = `${chapter.id}/${example.id}`, pairs = value => Array.isArray(value) && value.every(row => Array.isArray(row) && row.length === 2 && row.every(text));
+            require(strings(example.grammar) && pairs(example.vocabulary) && pairs(example.idioms) && pairs(example.tenseVariants) && example.tenseVariants.length > 0, `${where}: an example without detail needs grammar, vocabulary, idioms and tenseVariants`);
+          }
         }
       }
     }

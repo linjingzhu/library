@@ -353,7 +353,9 @@
       const example=chapter?.examples?.[index];
       if(study&&example){
         study.querySelectorAll('.example-item').forEach((item,i)=>item.setAttribute('aria-pressed',String(i===index)));
-        study.querySelector('.example-detail').innerHTML=exampleDetailMarkup(example);
+        const panel=study.querySelector('.example-detail');
+        panel.innerHTML=exampleDetailMarkup(example);
+        panel.scrollTop=0;
       }
       return;
     }
