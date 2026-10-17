@@ -39,3 +39,32 @@
 .reading-point .point-text .ln{display:block;padding-left:calc(var(--lv,0)*1.4em)}.reading-point .point-text .ln+.ln{margin-top:.15em}
 .reading-point .point-text .tbl-wrap{display:block;overflow-x:auto;margin:10px 0 10px calc(var(--lv,0)*1.4em);max-width:calc(100% - var(--lv,0)*1.4em);border:1px solid var(--line);border-radius:6px}.reading-point table{border-collapse:collapse;width:100%;font-size:calc(var(--reading-size) - 1px);line-height:1.7;color:#556056}.reading-point th,.reading-point td{padding:9px 14px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line);white-space:normal;word-break:keep-all;overflow-wrap:break-word}.reading-point th{background:var(--soft);color:var(--ink);font-weight:600;white-space:nowrap}.reading-point tbody tr:last-child td{border-bottom:0}.reading-point td+td,.reading-point th+th{border-left:1px solid var(--line)}.reading-point tbody tr:nth-child(even) td{background:#fafbf6}@media print{.reading-point .tbl-wrap{overflow:visible}.reading-point table{break-inside:avoid}}
 .reading-point .point-text .ln.li{position:relative;padding-left:calc(var(--lv,0)*1.4em + 1.1em)}.reading-point .point-text .ln.li::before{content:'•';position:absolute;left:calc(var(--lv,0)*1.4em + .1em);color:#89947e}
+
+/* Situation-based English: paired examples with focused study details. */
+.example-study{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);align-items:start;gap:20px;margin-top:28px}
+.example-list,.example-detail{min-width:0;border:1px solid var(--line);border-radius:9px;background:#fff}
+.example-list{padding:20px}
+.example-list>h2{font-size:15px;font-weight:600}
+.example-instruction{margin:6px 0 14px;font-size:11px;line-height:1.8;color:var(--muted)}
+.example-item{display:block;width:100%;padding:14px 13px;margin-top:8px;border:1px solid var(--line);border-radius:7px;text-align:left;background:#fcfcf9}
+.example-item:hover{background:#f4f6ef;border-color:#cdd7bf}
+.example-item[aria-pressed=true]{background:#edf2e6;border-color:#9bab88;box-shadow:inset 3px 0 #71845e}
+.example-english,.example-korean{display:block;line-height:1.8;overflow-wrap:anywhere}
+.example-english{font-size:13px;font-weight:600;color:var(--ink)}
+.example-korean{margin-top:5px;font-size:12px;color:var(--muted)}
+.example-detail{position:sticky;top:18px;max-height:calc(100vh - 36px);overflow:auto;padding:24px}
+.example-detail-heading{padding-bottom:18px;border-bottom:1px solid var(--line)}
+.example-detail-heading .tiny-label{margin-bottom:8px}
+.example-detail-heading h2{font-size:17px;line-height:1.8;overflow-wrap:anywhere}
+.example-detail-heading>p{margin-top:8px;font-size:13px;line-height:1.9;color:var(--muted)}
+.example-detail-section{padding:16px 0;border-bottom:1px solid var(--line)}
+.example-detail-section:last-child{border-bottom:0}
+.example-detail-section h3{margin-bottom:8px;font-size:12px;color:#647451}
+.example-detail-section ul{margin:0;padding-left:18px}
+.example-detail-section li,.example-detail-section>p{font-size:12px;line-height:1.9;color:#556056}
+.example-detail-section li+li{margin-top:7px}
+.example-detail-section strong{color:var(--ink)}
+.example-variant{display:inline-block;margin-top:3px;font-family:Georgia,serif}
+.example-muted{color:var(--muted)}
+@media(max-width:760px){.example-study{grid-template-columns:1fr}.example-detail{position:static;max-height:none;order:2}.example-list{order:1}}
+@media(prefers-reduced-motion:reduce){.example-item{scroll-behavior:auto}}
