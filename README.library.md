@@ -137,3 +137,13 @@ npm run build:pages
 - 기존 AI 개발 정책 파일은 유지합니다. 프로젝트 기능 설명은 이 문서에 한정합니다.
 
 검증은 데이터 구조 검사와 실제 브라우저에서의 탐색·검색·저장·반응형 화면 확인을 구분합니다. 내용 범위 검사만으로 모든 요약의 의미 정확성을 증명하지는 않습니다.
+
+## Sentence detail drills (`example.detail.drills`)
+
+Every example with a `detail` carries exactly three drills, in this order:
+
+- `빈칸` — `question` has exactly one `____`; `hint` (Korean) says what goes in; filling `answer` must restate part of the example sentence.
+- `변형` — `base` is a piece of the example sentence shown as 원문; `question` is a Korean instruction that does not repeat it; `answer` differs from `base`.
+- `번역` — `question` is Korean; `answer` is a new English sentence at least three words away from the example sentence, so it tests the pattern, not recall.
+
+Each drill has `answer` and `explain`, and may list other accepted answers in `alt`. `scripts/catalog.mjs` enforces all of this.

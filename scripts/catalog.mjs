@@ -64,8 +64,21 @@ export function validateExampleDetail(example, where) {
   rows(detail.pitfalls, 3, 2, 3, 'detail.pitfalls');
   rows(detail.patterns, 3, 3, 3, 'detail.patterns');
   require(Array.isArray(detail.drills) && JSON.stringify(detail.drills.map(item => item && item.type)) === JSON.stringify(['빈칸','변형','번역']), 'detail.drills must be 빈칸, 변형, 번역');
-  for (const drill of detail.drills) require(text(drill.question) && text(drill.answer) && text(drill.explain), 'detail.drills items need question, answer and explain');
-  require(/_{3,}/.test(detail.drills[0].question), 'the 빈칸 drill needs a blank ____');
+  const words = value => normalizeSentence(value).split(' ').filter(Boolean);
+  const wordDistance = (a, b) => { const x = words(a), y = words(b), row = Array.from({ length: y.length + 1 }, (_, j) => j); for (let i = 1; i <= x.length; i++) { let prev = row[0]; row[0] = i; for (let j = 1; j <= y.length; j++) { const keep = row[j]; row[j] = Math.min(row[j] + 1, row[j - 1] + 1, prev + (x[i - 1] === y[j - 1] ? 0 : 1)); prev = keep; } } return row[y.length]; };
+  for (const drill of detail.drills) {
+    require(text(drill.question) && text(drill.answer) && text(drill.explain), 'detail.drills items need question, answer and explain');
+    require(drill.alt === undefined || (Array.isArray(drill.alt) && drill.alt.every(text)), 'detail.drills alt must be a list of strings');
+  }
+  const [blank, change, translate] = detail.drills;
+  require((blank.question.match(/_{3,}/g) || []).length === 1, 'the 빈칸 drill needs exactly one blank ____');
+  require(text(blank.hint) && korean(blank.hint), 'the 빈칸 drill needs a Korean hint');
+  require(sentence.includes(normalizeSentence(blank.question.replace(/_{3,}/, blank.answer))), 'the 빈칸 drill must restate the example sentence with its answer filled in');
+  require(text(change.base) && sentence.includes(normalizeSentence(change.base)), 'the 변형 drill base must be part of the example sentence');
+  require(korean(change.question) && !normalizeSentence(change.question).includes(normalizeSentence(change.base)), 'the 변형 drill instruction must be Korean and must not repeat the base');
+  require(normalizeSentence(change.answer) !== normalizeSentence(change.base), 'the 변형 drill answer must differ from its base');
+  require(korean(translate.question), 'the 번역 drill question must be Korean');
+  require(wordDistance(translate.answer, example.english) >= 3, 'the 번역 drill answer must not be a one-word variation of the example sentence');
 }
 
 export function validateCatalog(books) {

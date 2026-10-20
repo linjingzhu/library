@@ -114,3 +114,8 @@
 @media(prefers-reduced-motion:reduce){.detail-block>summary::before{transition:none}}
 @media print{.example-detail{position:static;max-height:none;overflow:visible}.detail-nav{display:none}}
 
+
+.detail-drill-base,.detail-drill-hint,.detail-drill-alt{display:flex;gap:8px;align-items:baseline}
+.detail-drill-base>span,.detail-drill-hint>span,.detail-drill-alt>span{flex:none;white-space:nowrap;font:600 10px/1.6 var(--sans,inherit);color:#647451}
+.detail-drill .detail-drill-hint,.detail-drill details .detail-drill-alt{color:#556056;font-size:12px}
+.detail-drill-base{font-family:Georgia,serif}

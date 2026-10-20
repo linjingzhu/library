@@ -124,7 +124,11 @@ test('every situation-based sentence carries a complete study detail, and each b
   const situation=books.find(b=>b.id==='situation-english');
   const examples=situation.chapters.flatMap(c=>c.examples);
   assert.ok(examples.length>=16);
-  for(const example of examples)assert.ok(example.detail,`${example.id} has no detail`);
+  for(const example of examples){
+    assert.ok(example.detail,`${example.id} has no detail`);
+    assert.deepEqual(Object.keys(example.detail).sort(),['alternatives','breakdown','drills','grammarDeep','patterns','phrases','pitfalls','reading','stress','tenses','translation','usage','words'],`${example.id} is missing detail sections`);
+    assert.deepEqual(example.detail.drills.map(q=>q.type),['빈칸','변형','번역'],`${example.id} is missing drills`);
+  }
   const fixture=structuredClone(situation);
   const first=fixture.chapters[0].examples[0];
   assert.doesNotThrow(()=>validateCatalog([fixture]));
@@ -142,7 +146,15 @@ test('every situation-based sentence carries a complete study detail, and each b
     ['alternatives out of order',d=>{d.alternatives.reverse()},/격식, 중립, 구어체/],
     ['pitfall row with an empty cell',d=>{d.pitfalls[0][2]=' '},/detail\.pitfalls rows/],
     ['drill types wrong',d=>{d.drills[0].type='번역'},/빈칸, 변형, 번역/],
-    ['blank drill without a blank',d=>{d.drills[0].question='No blank here'},/needs a blank/],
+    ['blank drill without a blank',d=>{d.drills[0].question='No blank here'},/exactly one blank/],
+    ['blank drill with two blanks',d=>{d.drills[0].question='____ ____ here'},/exactly one blank/],
+    ['blank drill without a hint',d=>{delete d.drills[0].hint},/Korean hint/],
+    ['blank drill that no longer restates the sentence',d=>{d.drills[0].answer='zzz'},/restate the example sentence/],
+    ['transform drill base not from the sentence',d=>{d.drills[1].base='A completely different sentence.'},/part of the example sentence/],
+    ['transform drill repeating its base in the instruction',d=>{d.drills[1].question+=' '+d.drills[1].base},/must not repeat the base/],
+    ['transform drill whose answer equals its base',d=>{d.drills[1].answer=d.drills[1].base},/must differ from its base/],
+    ['translate drill answer is a one-word variation',d=>{d.drills[2].answer=first.english.replace('topology','mesh')},/one-word variation/],
+    ['translate drill answer copies the example',d=>{d.drills[2].answer=first.english},/one-word variation/],
   ];
   for(const [name,mutate,message] of mutations){
     const broken=structuredClone(fixture);mutate(broken.chapters[0].examples[0].detail);
