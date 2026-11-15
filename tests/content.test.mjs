@@ -71,11 +71,13 @@ test('reader-facing copy does not mention the source file format or upload contr
 
 test('every book sits on a known shelf: original books are Common · 인문, English books are classified separately',()=>{
   assert.deepEqual(SHELVES.map(s=>s.label),['English','Electronic','Tech','Common']);
-  for(const book of books.filter(b=>!['grammar','situation-english'].includes(b.id))){assert.equal(book.shelf,'common',book.id);assert.equal(book.section,'인문',book.id);}
+  for(const book of books.filter(b=>!['grammar','situation-english','electrical-engineer'].includes(b.id))){assert.equal(book.shelf,'common',book.id);assert.equal(book.section,'인문',book.id);}
   const grammar=books.find(b=>b.id==='grammar');
   assert.equal(grammar.shelf,'english');assert.equal(grammar.section,'Grammar');
   const situation=books.find(b=>b.id==='situation-english');
   assert.equal(situation.shelf,'english');assert.equal(situation.section,'상황별 학습');
+  const electrical=books.find(b=>b.id==='electrical-engineer');
+  assert.equal(electrical.shelf,'electronic');assert.equal(electrical.section,'전기기사');
   const fixture=structuredClone(books[0]);
   for(const shelf of [undefined,'','humanities']){fixture.shelf=shelf;assert.throws(()=>validateCatalog([fixture]),/shelf must be one of/);}
   fixture.shelf='english';
@@ -92,11 +94,11 @@ test('a book without page numbers is valid only when none of its chapters claim 
   assert.throws(()=>validateCatalog([fixture]),/without pages/);
 });
 
-test('grammar notes use only well-formed, consistent tables',()=>{
-  const grammar=books.find(b=>b.id==='grammar');
+test('grammar and electrical-engineer notes use only well-formed, consistent tables',()=>{
+  const tabled=['grammar','electrical-engineer'].map(id=>books.find(b=>b.id===id));
   const separator=/^\|(\s*:?-{3,}:?\s*\|)+$/;
   const cells=line=>line.trim().replace(/^\|/,'').replace(/\|$/,'').split('|').map(cell=>cell.trim());
-  for(const chapter of grammar.chapters)for(const point of chapter.points){
+  for(const chapter of tabled.flatMap(b=>b.chapters))for(const point of chapter.points){
     const where=`${chapter.id} · ${point.title}`;
     const lines=point.text.split('\n');
     for(let i=0;i<lines.length;){
